@@ -1,5 +1,6 @@
 CREATE TABLE Customers (
     tax_code VARCHAR(30) PRIMARY KEY,
+    last_name VARCHAR(20) NOT NULL,
     first_name VARCHAR(20) NOT NULL,
     birth_date DATE NOT NULL,
     email VARCHAR(20) NOT NULL UNIQUE,
