@@ -1,3 +1,10 @@
+.dockerignore
+.gitignore
+.idea
+README.md
+Architecture.svg
+docker-compose.yml
+
 # Editor configuration files
 .idea/
 
