@@ -1,0 +1,45 @@
+version: "3.3"
+
+networks:
+  pgsql_network:
+    driver: bridge
+    ipam:
+      driver: default
+      config:
+        - subnet: 172.22.0.0/24
+
+services:
+  pgsql:
+    image: postgres:latest
+    restart: unless-stopped
+    container_name: postgresql
+    networks:
+      pgsql_network:
+        ipv4_address: 172.22.0.3
+    ports:
+      - target: 5432
+        published: 5432
+        protocol: tcp
+        mode: host
+    environment:
+      - POSTGRES_PASSWORD=root
+    volumes:
+      - postgres-volume:/var/lib/postgresql/data
+  pgadmin:
+    image: dpage/pgadmin4
+    restart: unless-stopped
+    container_name: pgadmin
+    networks:
+      pgsql_network:
+        ipv4_address: 172.22.0.2
+    ports:
+      - target: 80
+        published: 80
+        protocol: tcp
+        mode: host
+    environment:
+      - PGADMIN_CONFIG_SERVER_MODE=True
+      - PGADMIN_DEFAULT_EMAIL=root@example.com
+      - PGADMIN_DEFAULT_PASSWORD=root
+volumes:
+  postgres-volume:
