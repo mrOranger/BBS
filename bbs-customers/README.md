@@ -1,6 +1,6 @@
 # Business Bank Management
 The following document is a draft of functional requirements
-of the application. Each parts contains the specifications
+of the application. Each parts contain the specifications
 about how data are organized in the database, what are the
 available operations on them, and the business rules that must
 be implements.
@@ -16,9 +16,9 @@ each __Address__ contains the following information: Country,
 State, Name of the city, Name of the Street, Street number
 and Postal Code. 
 
-Each __Customer__ is identified by a Tax Code, has an unique email address,
+Each __Customer__ is identified by a Tax Code, has a unique email address,
 that must be verified before starting to use their account
-in the system, and of course name, surname and birth date. Each
+in the system, and of course name, surname and birthdate. Each
 customer must be at least eighteen years old, and
 needs a password to use their account.
 
@@ -27,7 +27,7 @@ that must be formatted in pdf.
 
 ## E-R Diagram
 
-Representing these data in form of a E-R diagram, we are able
+Representing these data in form of an E-R diagram, we are able
 to produce the following result:
 ![ER Diagram](ER.svg)
 
