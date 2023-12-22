@@ -4,11 +4,12 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
 
 import java.io.Serial;
 import java.io.Serializable;
 
-@Entity @Table(name = "Addresses") @Data
+@Entity @Table(name = "Addresses") @Data @NoArgsConstructor
 public class Address implements Serializable {
     @Serial
     private static final long serialVersionUID = 2L;
@@ -34,7 +35,7 @@ public class Address implements Serializable {
     @Column(name = "postal_code", nullable = false, length = 20)
     private String postalCode;
 
-    @ManyToOne @EqualsAndHashCode.Exclude @JoinColumn(name = "tax_code", referencedColumnName = "taxCode")
+    @ManyToOne @EqualsAndHashCode.Exclude @JoinColumn(name = "customer", referencedColumnName = "tax_code")
     @JsonManagedReference
     private Customer customer;
 

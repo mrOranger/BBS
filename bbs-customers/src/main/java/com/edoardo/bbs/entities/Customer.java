@@ -3,6 +3,7 @@ package com.edoardo.bbs.entities;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -10,7 +11,7 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-@Entity @Table(name = "Customers") @Data
+@Entity @Table(name = "Customers") @Data @NoArgsConstructor
 public class Customer implements Serializable {
 
     @Serial
@@ -19,16 +20,16 @@ public class Customer implements Serializable {
     @Id @Column(name = "tax_code", length = 30)
     private String taxCode;
 
-    @Column(name = "first_name", nullable = false, length = 20)
+    @Column(name = "first_name", nullable = false, length = 50)
     private String firstName;
 
-    @Column(name = "last_name", nullable = false, length = 20)
+    @Column(name = "last_name", nullable = false, length = 50)
     private String lastName;
 
     @Column(name = "birth_date", nullable = false)
     private Date birthDate;
 
-    @Column(name = "email", nullable = false, unique = true, length = 20)
+    @Column(name = "email", nullable = false, unique = true, length = 50)
     private String email;
 
     @Column(name = "email_verified_at")
