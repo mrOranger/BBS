@@ -27,6 +27,7 @@ public class Customer implements Serializable {
     private String lastName;
 
     @Column(name = "birth_date", nullable = false)
+    @Temporal(TemporalType.DATE)
     private Date birthDate;
 
     @Column(name = "email", nullable = false, unique = true, length = 50)
