@@ -20,10 +20,11 @@ public class FindByFirstNameAndLastNameTest {
     private final Faker faker;
     private int maxRandomElements;
 
-    @Autowired
-    private CustomerRepository customerRepository;
+    private final CustomerRepository customerRepository;
 
-    public FindByFirstNameAndLastNameTest() {
+    @Autowired
+    public FindByFirstNameAndLastNameTest(CustomerRepository customerRepository) {
+        this.customerRepository = customerRepository;
         this.faker = new Faker();
     }
 

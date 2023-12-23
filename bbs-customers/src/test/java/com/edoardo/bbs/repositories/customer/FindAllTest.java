@@ -18,10 +18,11 @@ public class FindAllTest {
     private final Faker faker;
     private int maxRandomElements;
 
-    @Autowired
-    private CustomerRepository customerRepository;
+    private final CustomerRepository customerRepository;
 
-    public FindAllTest() {
+    @Autowired
+    public FindAllTest(CustomerRepository customerRepository) {
+        this.customerRepository = customerRepository;
         this.faker = new Faker();
     }
 

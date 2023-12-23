@@ -22,10 +22,12 @@ public class DeleteTest {
 
     private final Faker faker;
 
-    @Autowired
-    private CustomerRepository customerRepository;
+    private final CustomerRepository customerRepository;
 
-    public DeleteTest() {
+
+    @Autowired
+    public DeleteTest(CustomerRepository customerRepository) {
+        this.customerRepository = customerRepository;
         this.faker = new Faker();
     }
 

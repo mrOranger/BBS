@@ -17,10 +17,11 @@ import java.util.Optional;
 public class FindByIdTest {
     private final Faker faker;
 
-    @Autowired
-    private CustomerRepository customerRepository;
+    private final CustomerRepository customerRepository;
 
-    public FindByIdTest() {
+    @Autowired
+    public FindByIdTest(CustomerRepository customerRepository) {
+        this.customerRepository = customerRepository;
         this.faker = new Faker();
     }
 

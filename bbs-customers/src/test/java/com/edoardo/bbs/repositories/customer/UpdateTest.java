@@ -22,10 +22,11 @@ public class UpdateTest {
 
     private final Faker faker;
 
-    @Autowired
-    private CustomerRepository customerRepository;
+    private final CustomerRepository customerRepository;
 
-    public UpdateTest() {
+    @Autowired
+    public UpdateTest(CustomerRepository customerRepository) {
+        this.customerRepository = customerRepository;
         this.faker = new Faker();
     }
 

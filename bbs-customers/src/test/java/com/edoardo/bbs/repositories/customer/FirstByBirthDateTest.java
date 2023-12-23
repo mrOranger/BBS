@@ -22,10 +22,11 @@ public class FirstByBirthDateTest {
     private final Faker faker;
     private int maxRandomElements;
 
-    @Autowired
-    private CustomerRepository customerRepository;
+    private final CustomerRepository customerRepository;
 
-    public FirstByBirthDateTest() {
+    @Autowired
+    public FirstByBirthDateTest(CustomerRepository customerRepository) {
+        this.customerRepository = customerRepository;
         this.faker = new Faker();
     }
 

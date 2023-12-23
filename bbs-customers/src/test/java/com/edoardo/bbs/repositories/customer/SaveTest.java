@@ -21,10 +21,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 public class SaveTest {
     private final Faker faker;
 
-    @Autowired
-    private CustomerRepository customerRepository;
+    private final CustomerRepository customerRepository;
 
-    public SaveTest() {
+    @Autowired
+    public SaveTest(CustomerRepository customerRepository) {
+        this.customerRepository = customerRepository;
         this.faker = new Faker();
     }
 
