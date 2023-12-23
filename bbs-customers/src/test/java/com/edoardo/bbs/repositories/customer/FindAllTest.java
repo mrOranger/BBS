@@ -1,6 +1,7 @@
-package com.edoardo.bbs.repositories;
+package com.edoardo.bbs.repositories.customer;
 
 import com.edoardo.bbs.entities.Customer;
+import com.edoardo.bbs.repositories.CustomerRepository;
 import com.github.javafaker.Faker;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,13 +15,13 @@ import java.util.stream.StreamSupport;
 import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
-public class CustomerRepositoryFindAllTest {
+public class FindAllTest {
     private final Faker faker;
     private final int maxRandomElements;
 
     @Autowired private CustomerRepository customerRepository;
 
-    public CustomerRepositoryFindAllTest() {
+    public FindAllTest() {
         this.maxRandomElements = (int)((Math.random() * 10) + 1);
         this.faker = new Faker();
     }
