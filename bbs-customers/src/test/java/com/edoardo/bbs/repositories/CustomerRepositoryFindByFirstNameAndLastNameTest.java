@@ -16,14 +16,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
-public class CustomerRepositoryFindByFirstNameAndLastName {
+public class CustomerRepositoryFindByFirstNameAndLastNameTest {
     private final Faker faker;
     private final int maxRandomElements;
 
     @Autowired
     private CustomerRepository customerRepository;
 
-    public CustomerRepositoryFindByFirstNameAndLastName() {
+    public CustomerRepositoryFindByFirstNameAndLastNameTest() {
         this.maxRandomElements = (int)((Math.random() * 10) + 1);
         this.faker = new Faker();
     }
@@ -33,8 +33,7 @@ public class CustomerRepositoryFindByFirstNameAndLastName {
         final String firstName = this.faker.name().firstName();
         final String lastname = this.faker.name().lastName();
 
-        final List<Customer> customers = StreamSupport.stream(
-                        this.customerRepository.findByFirstNameAndLastName(firstName, lastname).spliterator(), false)
+        final List<Customer> customers = this.customerRepository.findByFirstNameAndLastName(firstName, lastname).stream()
                 .toList();
 
         assertThat(customers.size()).isEqualTo(0);
@@ -51,8 +50,7 @@ public class CustomerRepositoryFindByFirstNameAndLastName {
                 this.faker.internet().password(), this.faker.file().toString()
         ));
 
-        final List<Customer> customers = StreamSupport.stream(
-                        this.customerRepository.findByFirstNameAndLastName(firstName, lastname).spliterator(), false)
+        final List<Customer> customers = this.customerRepository.findByFirstNameAndLastName(firstName, lastname).stream()
                 .toList();
 
         assertThat(customers.size()).isEqualTo(1);
@@ -70,8 +68,7 @@ public class CustomerRepositoryFindByFirstNameAndLastName {
             ));
         }
 
-        final List<Customer> customers = StreamSupport.stream(
-                        this.customerRepository.findByFirstNameAndLastName(firstName, lastname).spliterator(), false)
+        final List<Customer> customers = this.customerRepository.findByFirstNameAndLastName(firstName, lastname).stream()
                 .toList();
 
         assertThat(customers.size()).isEqualTo(this.maxRandomElements);

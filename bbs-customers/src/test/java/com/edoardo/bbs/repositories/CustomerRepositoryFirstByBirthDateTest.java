@@ -34,8 +34,7 @@ public class CustomerRepositoryFirstByBirthDateTest {
     public void testGetAllCustomersReturnsNoneCustomer () {
         final Date birthDate = this.faker.date().birthday();
 
-        final List<Customer> customers = StreamSupport.stream(
-                        this.customerRepository.findByBirthDate(birthDate).spliterator(), false)
+        final List<Customer> customers = this.customerRepository.findByBirthDate(birthDate).stream()
                 .toList();
 
         assertThat(customers.size()).isEqualTo(0);
@@ -50,8 +49,7 @@ public class CustomerRepositoryFirstByBirthDateTest {
                 this.faker.internet().password(), this.faker.file().toString()
         ));
 
-        final List<Customer> customers = StreamSupport.stream(
-                        this.customerRepository.findByBirthDate(birthDate).spliterator(), false)
+        final List<Customer> customers = this.customerRepository.findByBirthDate(birthDate).stream()
                 .toList();
 
         assertThat(customers.size()).isEqualTo(1);
@@ -68,8 +66,7 @@ public class CustomerRepositoryFirstByBirthDateTest {
             ));
         }
 
-        final List<Customer> customers = StreamSupport.stream(
-                        this.customerRepository.findByBirthDate(birthDate).spliterator(), false)
+        final List<Customer> customers = this.customerRepository.findByBirthDate(birthDate).stream()
                 .toList();
 
         assertThat(customers.size()).isEqualTo(this.maxRandomElements);
