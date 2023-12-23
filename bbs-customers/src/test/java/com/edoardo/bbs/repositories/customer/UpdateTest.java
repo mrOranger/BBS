@@ -17,23 +17,27 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
-public class SaveTest {
+public class UpdateTest {
+
     private final Faker faker;
 
     @Autowired
     private CustomerRepository customerRepository;
 
-    public SaveTest() {
+    public UpdateTest() {
         this.faker = new Faker();
     }
 
     @Test
-    public void testSaveCustomerWithoutAddress () {
+    public void testUpdateCustomerWithoutAddress () {
         final Customer newCustomer = new Customer(
                 this.faker.code().isbn10(), this.faker.name().firstName(), this.faker.name().lastName(),
                 this.faker.date().birthday(), this.faker.internet().emailAddress(), this.faker.date().birthday(),
                 this.faker.internet().password(), this.faker.file().toString()
         );
+        this.customerRepository.save(newCustomer);
+        newCustomer.setFirstName(this.faker.name().firstName());
+        newCustomer.setLastName(this.faker.name().lastName());
         this.customerRepository.save(newCustomer);
 
         final Optional<Customer> customer = this.customerRepository.findById(newCustomer.getTaxCode());
@@ -60,6 +64,9 @@ public class SaveTest {
         );
         address.setCustomer(newCustomer);
         newCustomer.getAddresses().add(address);
+        this.customerRepository.save(newCustomer);
+        address.setCity(this.faker.address().city());
+        address.setCountry(this.faker.address().country());
         this.customerRepository.save(newCustomer);
 
         final Optional<Customer> customer = this.customerRepository.findById(newCustomer.getTaxCode());
