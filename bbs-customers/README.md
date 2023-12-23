@@ -35,4 +35,12 @@ after that, we can translate the ER diagram in SQL tables:
 
 ![Tables Diagram](Tables.svg)
 
+## Business Rules
 
+The next step consists in identify the business rules that allows to keep
+the data stored in the database consistent. The following table contains
+an identifier of the business rules, and then an informal description.
+
+| Business Rule ID | Description                                  |
+|------------------|----------------------------------------------|
+| BR1              | A new customer must be at lest 18 years old. |
