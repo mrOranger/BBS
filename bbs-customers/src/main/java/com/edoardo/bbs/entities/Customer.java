@@ -2,6 +2,8 @@ package com.edoardo.bbs.entities;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -11,9 +13,8 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-@Entity @Table(name = "Customers") @Data @NoArgsConstructor
+@Entity @Table(name = "Customers") @Data @NoArgsConstructor @AllArgsConstructor @Builder
 public class Customer implements Serializable {
-
     @Serial
     private static final long serialVersionUID = 1L;
 
@@ -46,17 +47,4 @@ public class Customer implements Serializable {
     @OneToMany(fetch = FetchType.LAZY, cascade =  CascadeType.ALL, mappedBy = "customer", orphanRemoval = true)
     @JsonManagedReference
     private Set<Address> addresses;
-
-    public Customer(String taxCode, String firstName, String lastName, Date birthDate,
-                    String email, Date emailVerifiedAt, String password, String idCard) {
-        this.taxCode = taxCode;
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.birthDate = birthDate;
-        this.email = email;
-        this.emailVerifiedAt = emailVerifiedAt;
-        this.password = password;
-        this.idCard = idCard;
-        this.addresses = new HashSet<>();
-    }
 }

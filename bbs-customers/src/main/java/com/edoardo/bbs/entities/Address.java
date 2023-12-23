@@ -2,14 +2,12 @@ package com.edoardo.bbs.entities;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import lombok.Data;
-import lombok.EqualsAndHashCode;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.io.Serial;
 import java.io.Serializable;
 
-@Entity @Table(name = "Addresses") @Data @NoArgsConstructor
+@Entity @Table(name = "Addresses") @Data @NoArgsConstructor @AllArgsConstructor @Builder
 public class Address implements Serializable {
     @Serial
     private static final long serialVersionUID = 2L;
@@ -38,14 +36,4 @@ public class Address implements Serializable {
     @ManyToOne @EqualsAndHashCode.Exclude @JoinColumn(name = "customer", referencedColumnName = "tax_code")
     @JsonManagedReference
     private Customer customer;
-
-    public Address (String country, String state, String city,
-                    String street, Integer streetNumber, String postalCode) {
-        this.country = country;
-        this.state = state;
-        this.city = city;
-        this.street = street;
-        this.streetNumber = streetNumber;
-        this.postalCode = postalCode;
-    }
 }
