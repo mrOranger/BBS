@@ -34,6 +34,7 @@ public class Customer implements Serializable {
     private String email;
 
     @Column(name = "email_verified_at")
+    @Temporal(TemporalType.DATE)
     private Date emailVerifiedAt;
 
     @Column(name = "password", nullable = false, length = 50)

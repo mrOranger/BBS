@@ -14,7 +14,7 @@ public class Address implements Serializable {
     @Serial
     private static final long serialVersionUID = 2L;
 
-    @Id @Column(name = "id")
+    @Id @Column(name = "id") @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @Column(name = "country", nullable = false, length = 30)
@@ -39,9 +39,8 @@ public class Address implements Serializable {
     @JsonManagedReference
     private Customer customer;
 
-    public Address (Integer id, String country, String state, String city,
+    public Address (String country, String state, String city,
                     String street, Integer streetNumber, String postalCode) {
-        this.id = id;
         this.country = country;
         this.state = state;
         this.city = city;
