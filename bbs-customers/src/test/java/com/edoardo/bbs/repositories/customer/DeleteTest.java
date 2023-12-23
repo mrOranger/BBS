@@ -10,6 +10,7 @@ import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
+import java.util.HashSet;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -29,12 +30,18 @@ public class DeleteTest {
     }
 
     @Test
-    public void testDeleteCustomerWithoutAddress () {
-        final Customer newCustomer = new Customer(
-                this.faker.code().isbn10(), this.faker.name().firstName(), this.faker.name().lastName(),
-                this.faker.date().birthday(), this.faker.internet().emailAddress(), this.faker.date().birthday(),
-                this.faker.internet().password(), this.faker.file().toString()
-        );
+    public void CustomerRepository_delete_withoutAddress_ReturnsCustomer () {
+        final Customer newCustomer = Customer.builder().taxCode(this.faker.code().isbn10())
+                .firstName(this.faker.name().firstName())
+                .lastName(this.faker.name().lastName())
+                .birthDate(this.faker.date().birthday())
+                .email(this.faker.internet().emailAddress())
+                .emailVerifiedAt(this.faker.date().birthday())
+                .password(this.faker.internet().password())
+                .idCard(this.faker.file().toString())
+                .addresses(new HashSet<>())
+                .build();
+
         this.customerRepository.save(newCustomer);
         this.customerRepository.delete(newCustomer);
 
@@ -44,14 +51,27 @@ public class DeleteTest {
     }
 
     @Test
-    public void testDeleteCustomerWithAddress () {
-        final Address address = new Address(this.faker.address().country(), this.faker.address().state(), this.faker.address().city(),
-                this.faker.address().streetName(), Integer.parseInt(this.faker.address().streetAddressNumber()), this.faker.address().zipCode());
-        final Customer newCustomer = new Customer(
-                this.faker.code().isbn10(), this.faker.name().firstName(), this.faker.name().lastName(),
-                this.faker.date().birthday(), this.faker.internet().emailAddress(), this.faker.date().birthday(),
-                this.faker.internet().password(), this.faker.file().toString()
-        );
+    public void CustomerRepository_delete_withAddress_ReturnsCustomer () {
+        final Address address = Address.builder().country(this.faker.address().country())
+                .state(this.faker.address().state())
+                .city(this.faker.address().city())
+                .street(this.faker.address().city())
+                .streetNumber(Integer.parseInt(this.faker.address().streetAddressNumber()))
+                .postalCode(this.faker.address().zipCode())
+                .build();
+        final Customer newCustomer = Customer.builder().taxCode(this.faker.code().isbn10())
+                .firstName(this.faker.name().firstName())
+                .lastName(this.faker.name().lastName())
+                .birthDate(this.faker.date().birthday())
+                .email(this.faker.internet().emailAddress())
+                .emailVerifiedAt(this.faker.date().birthday())
+                .password(this.faker.internet().password())
+                .idCard(this.faker.file().toString())
+                .addresses(new HashSet<>())
+                .build();
+
+        address.setCustomer(newCustomer);
+        newCustomer.getAddresses().add(address);
         this.customerRepository.save(newCustomer);
         this.customerRepository.delete(newCustomer);
 

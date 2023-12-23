@@ -3,67 +3,75 @@ package com.edoardo.bbs.repositories.customer;
 import com.edoardo.bbs.entities.Customer;
 import com.edoardo.bbs.repositories.CustomerRepository;
 import com.github.javafaker.Faker;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
+import org.assertj.core.api.Assertions;
 
 import java.util.List;
-import java.util.stream.StreamSupport;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 @DataJpaTest @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
 public class FindAllTest {
     private final Faker faker;
-    private final int maxRandomElements;
+    private int maxRandomElements;
 
-    @Autowired private CustomerRepository customerRepository;
+    @Autowired
+    private CustomerRepository customerRepository;
 
     public FindAllTest() {
-        this.maxRandomElements = (int)((Math.random() * 10) + 1);
         this.faker = new Faker();
     }
 
-    @Test
-    public void testGetAllCustomersReturnsNoneCustomer () {
-        final List<Customer> customers = StreamSupport.stream(
-                        this.customerRepository.findAll().spliterator(), false)
-                .toList();
-
-        assertThat(customers.size()).isEqualTo(0);
+    @BeforeEach
+    public void init () {
+        this.maxRandomElements = (int)((Math.random() * 10) + 1);
     }
 
     @Test
-    public void testGetAllCustomersReturnsSingleCustomer () {
-        this.customerRepository.save(new Customer(
-                this.faker.code().isbn10(), this.faker.name().firstName(), this.faker.name().lastName(),
-                this.faker.date().birthday(), this.faker.internet().emailAddress(), this.faker.date().birthday(),
-                this.faker.internet().password(), this.faker.file().toString()
-        ));
+    public void CustomerRepository_findAll_ReturnsEmptyList () {
+        final List<Customer> customers = this.customerRepository.findAll();
 
-        final List<Customer> customers = StreamSupport.stream(
-                        this.customerRepository.findAll().spliterator(), false)
-                .toList();
-
-        assertThat(customers.size()).isEqualTo(1);
+        Assertions.assertThat(customers.size()).isEqualTo(0);
     }
 
     @Test
-    public void testGetAllCustomersReturnsManyCustomers () {
+    public void CustomerRepository_findAll_ReturnsOneCustomerList () {
+        final Customer newCustomer = Customer.builder().taxCode(this.faker.code().isbn10())
+                .firstName(this.faker.name().firstName())
+                .lastName(this.faker.name().lastName())
+                .birthDate(this.faker.date().birthday())
+                .email(this.faker.internet().emailAddress())
+                .emailVerifiedAt(this.faker.date().birthday())
+                .password(this.faker.internet().password())
+                .idCard(this.faker.file().toString())
+                .build();
+        this.customerRepository.save(newCustomer);
+
+        final List<Customer> customers = this.customerRepository.findAll();
+
+        Assertions.assertThat(customers.size()).isEqualTo(1);
+    }
+
+    @Test
+    public void CustomerRepository_findAll_ReturnsManyCustomersList () {
         for (int i = 0; i < this.maxRandomElements; i++) {
-            this.customerRepository.save(new Customer(
-                    this.faker.code().isbn10(), this.faker.name().firstName(), this.faker.name().lastName(),
-                    this.faker.date().birthday(), this.faker.internet().emailAddress(), this.faker.date().birthday(),
-                    this.faker.internet().password(), this.faker.file().toString()
-            ));
+            final Customer newCustomer = Customer.builder().taxCode(this.faker.code().isbn10())
+                    .firstName(this.faker.name().firstName())
+                    .lastName(this.faker.name().lastName())
+                    .birthDate(this.faker.date().birthday())
+                    .email(this.faker.internet().emailAddress())
+                    .emailVerifiedAt(this.faker.date().birthday())
+                    .password(this.faker.internet().password())
+                    .idCard(this.faker.file().toString())
+                    .build();
+            this.customerRepository.save(newCustomer);
         }
 
-        final List<Customer> customers = StreamSupport.stream(
-                        this.customerRepository.findAll().spliterator(), false)
-                .toList();
+        final List<Customer> customers = this.customerRepository.findAll();
 
-        assertThat(customers.size()).isEqualTo(this.maxRandomElements);
+        Assertions.assertThat(customers.size()).isEqualTo(this.maxRandomElements);
     }
 }
