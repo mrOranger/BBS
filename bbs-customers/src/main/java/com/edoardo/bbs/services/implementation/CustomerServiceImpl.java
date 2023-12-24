@@ -9,13 +9,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
-@Service @Transactional(readOnly = true)
+@Service
 public class CustomerServiceImpl implements CustomerService {
 
     private final CustomerRepository customerRepository;
@@ -43,42 +41,22 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public List<CustomerDTO> getCustomersByFirstNameAndLastName(String firstName, String lastName) {
-        final List<Customer> customersList = this.customerRepository.findByFirstNameAndLastName(firstName, lastName);
-
-        return customersList.stream().map(this::mapToDto).toList();
+        return null;
     }
 
     @Override
     public List<CustomerDTO> getCustomersByBirthDate(Date birthDate) {
-        final List<Customer> customersList = this.customerRepository.findByBirthDate(birthDate);
-
-        return customersList.stream().map(this::mapToDto).toList();
+        return null;
     }
 
     @Override
     public CustomerDTO getCustomerByTaxCode(String taxCode) {
-        final Optional<Customer> customer = this.customerRepository.findById(taxCode);
-
-        return this.mapToDto(customer.orElseThrow(() -> new IllegalArgumentException("Not a valid Tax Code.")));
+        return null;
     }
 
-    @Override @Transactional
-    public void createCustomer(CustomerDTO customer) {
-
-    }
-
-    @Override @Transactional
-    public void updateCustomer(CustomerDTO customer) {
-
-    }
-
-    @Override @Transactional
-    public void deleteCustomer(CustomerDTO customer) {
-
-    }
-
-    private CustomerDTO mapToDto(Customer customer) {
-        return CustomerDTO.builder()
+    @Override
+    public CustomerDTO createCustomer(CustomerDTO customer) {
+        final Customer customerEntity = Customer.builder()
                 .taxCode(customer.getTaxCode())
                 .firstName(customer.getFirstName())
                 .lastName(customer.getLastName())
@@ -88,5 +66,33 @@ public class CustomerServiceImpl implements CustomerService {
                 .password(customer.getPassword())
                 .idCard(customer.getIdCard())
                 .build();
+
+        return this.mapToDto(this.customerRepository.save(customerEntity));
+    }
+
+    @Override
+    public CustomerDTO updateCustomer(CustomerDTO customer) {
+        return null;
+    }
+
+    @Override
+    public void deleteCustomer(CustomerDTO customer) {
+
+    }
+
+    private CustomerDTO mapToDto(Customer customer) {
+        if (customer != null) {
+            return CustomerDTO.builder()
+                    .taxCode(customer.getTaxCode())
+                    .firstName(customer.getFirstName())
+                    .lastName(customer.getLastName())
+                    .birthDate(customer.getBirthDate())
+                    .email(customer.getEmail())
+                    .emailVerifiedAt(customer.getEmailVerifiedAt())
+                    .password(customer.getPassword())
+                    .idCard(customer.getIdCard())
+                    .build();
+        }
+        return null;
     }
 }

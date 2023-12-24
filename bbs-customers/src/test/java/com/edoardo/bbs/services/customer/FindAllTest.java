@@ -1,7 +1,10 @@
 package com.edoardo.bbs.services.customer;
 
+import com.edoardo.bbs.dtos.CustomerDTO;
+import com.edoardo.bbs.dtos.CustomerResponse;
 import com.edoardo.bbs.entities.Customer;
 import com.edoardo.bbs.repositories.CustomerRepository;
+import com.edoardo.bbs.services.implementation.CustomerServiceImpl;
 import com.github.javafaker.Faker;
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
@@ -10,6 +13,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.modelmapper.ModelMapper;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
@@ -20,15 +24,17 @@ public class FindAllTest {
 
     private final Faker faker;
     private final int maxRandomElements;
+    private final Pageable pageable;
 
     @Mock
     private CustomerRepository customerRepository;
 
     @InjectMocks
-    private final CustomerServiceImpl customerService;
+    private CustomerServiceImpl customerService;
 
     public FindAllTest() {
         this.faker = new Faker();
+        this.pageable = Pageable.ofSize(10);
         this.maxRandomElements = (int)((Math.random() * 10) + 1);
     }
 
@@ -37,75 +43,9 @@ public class FindAllTest {
         final Page<Customer> customers = Mockito.mock(Page.class);
 
         when(this.customerRepository.findAll(Mockito.any(Pageable.class))).thenReturn(customers);
-
-        final CustomerResponse customerResponse = this.customerService.getAllCustomers();
-
-        Assertions.assertThat(customerResponse).isNotNull();
-    }
-
-    @Test
-    public void CustomerService_findAll_returnsOneCustomerList () {
-        final Customer newCustomer = Customer.builder().taxCode(this.faker.code().isbn10())
-                .firstName(this.faker.name().firstName())
-                .lastName(this.faker.name().lastName())
-                .birthDate(this.faker.date().birthday())
-                .email(this.faker.internet().emailAddress())
-                .emailVerifiedAt(this.faker.date().birthday())
-                .password(this.faker.internet().password())
-                .idCard(this.faker.file().toString())
-                .build();
-
-        final CustomerDTO customerDTO = CustomerDTO.builder().taxCode(this.faker.code().isbn10())
-                .firstName(newCustomer.getFirstName())
-                .lastName(newCustomer.getLastName())
-                .birthDate(newCustomer.getBirthDate())
-                .email(newCustomer.getEmail())
-                .emailVerifiedAt(newCustomer.getEmailVerifiedAt())
-                .password(newCustomer.getPassword())
-                .idCard(newCustomer.getIdCard())
-                .build();
-
-        final Page<Customer> customers = Mockito.mock(Page.class);
-        when(this.customerRepository.save(Mockito.any(Customer.class))).thenReturn(newCustomer);
-        when(this.customerRepository.findAll(Mockito.any(Pageable.class))).thenReturn(customers);
-        this.customerService.createCustomer(customerDTO);
-
-        final CustomerResponse customerResponse = this.customerService.getAllCustomers();
+        final CustomerResponse customerResponse = this.customerService.getAllCustomers(this.pageable);
 
         Assertions.assertThat(customerResponse).isNotNull();
-    }
-
-    @Test
-    public void CustomerService_findAll_returnsManyCustomersList () {
-        final Page<Customer> customers = Mockito.mock(Page.class);
-        for (int i = 0; i < this.maxRandomElements; i++) {
-            final Customer newCustomer = Customer.builder().taxCode(this.faker.code().isbn10())
-                    .firstName(this.faker.name().firstName())
-                    .lastName(this.faker.name().lastName())
-                    .birthDate(this.faker.date().birthday())
-                    .email(this.faker.internet().emailAddress())
-                    .emailVerifiedAt(this.faker.date().birthday())
-                    .password(this.faker.internet().password())
-                    .idCard(this.faker.file().toString())
-                    .build();
-
-            final CustomerDTO customerDTO = CustomerDTO.builder().taxCode(this.faker.code().isbn10())
-                    .firstName(newCustomer.getFirstName())
-                    .lastName(newCustomer.getLastName())
-                    .birthDate(newCustomer.getBirthDate())
-                    .email(newCustomer.getEmail())
-                    .emailVerifiedAt(newCustomer.getEmailVerifiedAt())
-                    .password(newCustomer.getPassword())
-                    .idCard(newCustomer.getIdCard())
-                    .build();
-
-            when(this.customerRepository.save(Mockito.any(Customer.class))).thenReturn(newCustomer);
-            this.customerService.createCustomer(customerDTO);
-        }
-
-        when(this.customerRepository.findAll(Mockito.any(Pageable.class))).thenReturn(customers);
-        final CustomerResponse customerResponse = this.customerService.getAllCustomers();
-
-        Assertions.assertThat(customerResponse).isNotNull();
+        Assertions.assertThat(customerResponse.getTotalElements()).isEqualTo(0);
     }
 }

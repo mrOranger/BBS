@@ -6,7 +6,6 @@ import org.springframework.data.domain.Pageable;
 
 import java.util.Date;
 import java.util.List;
-import java.util.Optional;
 
 public interface CustomerService {
     CustomerResponse getAllCustomers (Pageable pageable);
@@ -15,7 +14,7 @@ public interface CustomerService {
 
     CustomerDTO getCustomerByTaxCode (String taxCode);
 
-    void createCustomer (CustomerDTO customer);
-    void updateCustomer (CustomerDTO customer);
+    CustomerDTO createCustomer (CustomerDTO customer);
+    CustomerDTO updateCustomer (CustomerDTO customer);
     void deleteCustomer (CustomerDTO customer);
 }
