@@ -1,8 +1,9 @@
 package com.edoardo.bbs.dtos;
 
+import lombok.Builder;
 import lombok.Data;
 
-@Data
+@Data @Builder
 public class AddressDTO {
     private Integer id;
     private String country;

@@ -1,12 +1,13 @@
 package com.edoardo.bbs.dtos;
 
+import lombok.Builder;
 import lombok.Data;
 
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-@Data
+@Data @Builder
 public class CustomerDTO {
     private String taxCode;
     private String firstName;
