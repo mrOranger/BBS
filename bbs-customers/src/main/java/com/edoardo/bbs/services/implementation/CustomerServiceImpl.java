@@ -42,7 +42,9 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public List<CustomerDTO> getCustomersByFirstNameAndLastName(String firstName, String lastName) {
-        return null;
+        return this.customerRepository.findByFirstNameAndLastName(firstName, lastName).stream()
+                .map(this::mapToDto)
+                .toList();
     }
 
     @Override
