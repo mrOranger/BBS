@@ -52,7 +52,8 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public CustomerDTO getCustomerByTaxCode(String taxCode) {
-        return null;
+        final Optional<Customer> customer = this.customerRepository.findById(taxCode);
+        return customer.map(this::mapToDto).orElse(null);
     }
 
     @Override

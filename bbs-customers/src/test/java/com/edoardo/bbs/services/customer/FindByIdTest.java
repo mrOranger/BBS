@@ -48,7 +48,6 @@ public class FindByIdTest {
                 .idCard(this.faker.file().toString())
                 .build();
 
-        when(this.customerRepository.findById(newCustomer.getTaxCode())).thenReturn(Optional.of(newCustomer));
         final CustomerDTO customer = this.customerService.getCustomerByTaxCode(newCustomer.getTaxCode());
 
         Assertions.assertThat(customer).isNull();
