@@ -49,7 +49,9 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public List<CustomerDTO> getCustomersByBirthDate(Date birthDate) {
-        return null;
+        return this.customerRepository.findByBirthDate(birthDate).stream()
+                .map(this::mapToDto)
+                .toList();
     }
 
     @Override

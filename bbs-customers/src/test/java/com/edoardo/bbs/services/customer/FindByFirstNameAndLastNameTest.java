@@ -2,7 +2,6 @@ package com.edoardo.bbs.services.customer;
 
 
 import com.edoardo.bbs.dtos.CustomerDTO;
-import com.edoardo.bbs.dtos.CustomerResponse;
 import com.edoardo.bbs.entities.Customer;
 import com.edoardo.bbs.repositories.CustomerRepository;
 import com.edoardo.bbs.services.implementation.CustomerServiceImpl;
