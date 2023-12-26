@@ -1,7 +1,9 @@
 package com.edoardo.bbs.services.implementation;
 
+import com.edoardo.bbs.dtos.AddressDTO;
 import com.edoardo.bbs.dtos.CustomerDTO;
 import com.edoardo.bbs.dtos.CustomerResponse;
+import com.edoardo.bbs.entities.Address;
 import com.edoardo.bbs.entities.Customer;
 import com.edoardo.bbs.repositories.CustomerRepository;
 import com.edoardo.bbs.services.CustomerService;
@@ -10,9 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class CustomerServiceImpl implements CustomerService {
@@ -62,6 +62,18 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public CustomerDTO createCustomer(CustomerDTO customer) {
+        final Set<Address> addresses = new HashSet<>();
+        customer.getAddresses().forEach((entity) -> {
+            final Address address = Address.builder()
+                    .country(entity.getCountry())
+                    .state(entity.getState())
+                    .city(entity.getCity())
+                    .street(entity.getStreet())
+                    .streetNumber(entity.getStreetNumber())
+                    .postalCode(entity.getPostalCode())
+                    .build();
+            addresses.add(address);
+        });
         final Customer customerEntity = Customer.builder()
                 .taxCode(customer.getTaxCode())
                 .firstName(customer.getFirstName())
@@ -71,6 +83,7 @@ public class CustomerServiceImpl implements CustomerService {
                 .emailVerifiedAt(customer.getEmailVerifiedAt())
                 .password(customer.getPassword())
                 .idCard(customer.getIdCard())
+                .addresses(addresses)
                 .build();
 
         return this.mapToDto(this.customerRepository.save(customerEntity));
@@ -88,6 +101,18 @@ public class CustomerServiceImpl implements CustomerService {
 
     private CustomerDTO mapToDto(Customer customer) {
         if (customer != null) {
+            final Set<AddressDTO> addresses = new HashSet<>();
+            customer.getAddresses().forEach((entity) -> {
+                final AddressDTO address = AddressDTO.builder()
+                        .country(entity.getCountry())
+                        .state(entity.getState())
+                        .city(entity.getCity())
+                        .street(entity.getStreet())
+                        .streetNumber(entity.getStreetNumber())
+                        .postalCode(entity.getPostalCode())
+                        .build();
+                addresses.add(address);
+            });
             return CustomerDTO.builder()
                     .taxCode(customer.getTaxCode())
                     .firstName(customer.getFirstName())
@@ -97,6 +122,7 @@ public class CustomerServiceImpl implements CustomerService {
                     .emailVerifiedAt(customer.getEmailVerifiedAt())
                     .password(customer.getPassword())
                     .idCard(customer.getIdCard())
+                    .addresses(addresses)
                     .build();
         }
         return null;
