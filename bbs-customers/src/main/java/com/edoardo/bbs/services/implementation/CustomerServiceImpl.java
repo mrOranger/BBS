@@ -91,6 +91,10 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public CustomerDTO updateCustomer(CustomerDTO customer) {
+        final Optional<Customer> existingCustomer = this.customerRepository.findById(customer.getTaxCode());
+        if (existingCustomer.isPresent()) {
+            return this.createCustomer(customer);
+        }
         return null;
     }
 

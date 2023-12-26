@@ -16,13 +16,14 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.HashSet;
+import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
-public class SaveTest {
+public class UpdateTest {
 
     @Mock
     private CustomerRepository customerRepository;
@@ -39,8 +40,8 @@ public class SaveTest {
     }
 
     @Test
-    public void CustomerRepository_save_withoutAddress_returnsCustomer () {
-        final Customer newCustomer = Customer.builder().taxCode(this.faker.code().isbn10())
+    public void CustomerRepository_update_withoutAddress_returnsCustomer () {
+        final Customer customer = Customer.builder().taxCode(this.faker.code().isbn10())
                 .firstName(this.faker.name().firstName())
                 .lastName(this.faker.name().lastName())
                 .birthDate(this.faker.date().birthday())
@@ -51,23 +52,24 @@ public class SaveTest {
                 .addresses(new HashSet<>())
                 .build();
 
-        when(this.customerRepository.save(Mockito.any(Customer.class))).thenReturn(newCustomer);
-        final CustomerDTO customer = this.customerService.createCustomer(this.mapToDto(newCustomer));
+        when(this.customerRepository.findById(customer.getTaxCode())).thenReturn(Optional.of(customer));
+        when(this.customerRepository.save(Mockito.any(Customer.class))).thenReturn(customer);
+        final CustomerDTO updatedCustomer = this.customerService.updateCustomer(this.mapToDto(customer));
 
-        assertThat(customer).isNotNull();
-        assertThat(customer.getTaxCode()).isEqualTo(newCustomer.getTaxCode());
-        assertThat(customer.getFirstName()).isEqualTo(newCustomer.getFirstName());
-        assertThat(customer.getLastName()).isEqualTo(newCustomer.getLastName());
-        assertThat(customer.getBirthDate()).isEqualTo(newCustomer.getBirthDate());
-        assertThat(customer.getEmail()).isEqualTo(newCustomer.getEmail());
-        assertThat(customer.getEmailVerifiedAt()).isEqualTo(newCustomer.getEmailVerifiedAt());
-        assertThat(customer.getPassword()).isEqualTo(newCustomer.getPassword());
-        assertThat(customer.getIdCard()).isEqualTo(newCustomer.getIdCard());
+        assertThat(updatedCustomer).isNotNull();
+        assertThat(updatedCustomer.getTaxCode()).isEqualTo(customer.getTaxCode());
+        assertThat(updatedCustomer.getFirstName()).isEqualTo(customer.getFirstName());
+        assertThat(updatedCustomer.getLastName()).isEqualTo(customer.getLastName());
+        assertThat(updatedCustomer.getBirthDate()).isEqualTo(customer.getBirthDate());
+        assertThat(updatedCustomer.getEmail()).isEqualTo(customer.getEmail());
+        assertThat(updatedCustomer.getEmailVerifiedAt()).isEqualTo(customer.getEmailVerifiedAt());
+        assertThat(updatedCustomer.getPassword()).isEqualTo(customer.getPassword());
+        assertThat(updatedCustomer.getIdCard()).isEqualTo(customer.getIdCard());
         assertThat(customer.getAddresses().size()).isEqualTo(0);
     }
 
     @Test
-    public void CustomerRepository_save_withAddress_returnsCustomer () {
+    public void CustomerRepository_update_withAddress_returnsCustomer () {
         final Address address = Address.builder().country(this.faker.address().country())
                 .state(this.faker.address().state())
                 .city(this.faker.address().city())
@@ -75,7 +77,7 @@ public class SaveTest {
                 .streetNumber(Integer.parseInt(this.faker.address().streetAddressNumber()))
                 .postalCode(this.faker.address().zipCode())
                 .build();
-        final Customer newCustomer = Customer.builder().taxCode(this.faker.code().isbn10())
+        final Customer customer = Customer.builder().taxCode(this.faker.code().isbn10())
                 .firstName(this.faker.name().firstName())
                 .lastName(this.faker.name().lastName())
                 .birthDate(this.faker.date().birthday())
@@ -86,18 +88,19 @@ public class SaveTest {
                 .addresses(Set.of(address))
                 .build();
 
-        when(this.customerRepository.save(Mockito.any(Customer.class))).thenReturn(newCustomer);
-        final CustomerDTO customer = this.customerService.createCustomer(this.mapToDto(newCustomer));
+        when(this.customerRepository.findById(customer.getTaxCode())).thenReturn(Optional.of(customer));
+        when(this.customerRepository.save(Mockito.any(Customer.class))).thenReturn(customer);
+        final CustomerDTO updatedCustomer = this.customerService.updateCustomer(this.mapToDto(customer));
 
-        assertThat(customer).isNotNull();
-        assertThat(customer.getTaxCode()).isEqualTo(newCustomer.getTaxCode());
-        assertThat(customer.getFirstName()).isEqualTo(newCustomer.getFirstName());
-        assertThat(customer.getLastName()).isEqualTo(newCustomer.getLastName());
-        assertThat(customer.getBirthDate()).isEqualTo(newCustomer.getBirthDate());
-        assertThat(customer.getEmail()).isEqualTo(newCustomer.getEmail());
-        assertThat(customer.getEmailVerifiedAt()).isEqualTo(newCustomer.getEmailVerifiedAt());
-        assertThat(customer.getPassword()).isEqualTo(newCustomer.getPassword());
-        assertThat(customer.getIdCard()).isEqualTo(newCustomer.getIdCard());
+        assertThat(updatedCustomer).isNotNull();
+        assertThat(updatedCustomer.getTaxCode()).isEqualTo(customer.getTaxCode());
+        assertThat(updatedCustomer.getFirstName()).isEqualTo(customer.getFirstName());
+        assertThat(updatedCustomer.getLastName()).isEqualTo(customer.getLastName());
+        assertThat(updatedCustomer.getBirthDate()).isEqualTo(customer.getBirthDate());
+        assertThat(updatedCustomer.getEmail()).isEqualTo(customer.getEmail());
+        assertThat(updatedCustomer.getEmailVerifiedAt()).isEqualTo(customer.getEmailVerifiedAt());
+        assertThat(updatedCustomer.getPassword()).isEqualTo(customer.getPassword());
+        assertThat(updatedCustomer.getIdCard()).isEqualTo(customer.getIdCard());
         assertThat(customer.getAddresses().size()).isEqualTo(1);
     }
 
