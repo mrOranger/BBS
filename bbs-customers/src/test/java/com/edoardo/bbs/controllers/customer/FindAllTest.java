@@ -5,7 +5,6 @@ import com.edoardo.bbs.dtos.AddressDTO;
 import com.edoardo.bbs.dtos.CustomerDTO;
 import com.edoardo.bbs.dtos.CustomerResponse;
 import com.edoardo.bbs.services.CustomerService;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.javafaker.Faker;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
@@ -16,7 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
-import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
@@ -34,43 +33,37 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class FindAllTest {
 
-    private Faker faker;
-
     @Autowired
     private MockMvc mockMvc;
 
     @MockBean
     private CustomerService customerService;
 
-    @Autowired
-    private ObjectMapper customerMapper;
-
     private List<CustomerDTO> customers;
-    private Set<AddressDTO> addresses;
 
     @BeforeEach
     public void init () {
-        this.faker = new Faker();
+        Faker faker = new Faker();
         for (int i = 0; i < 10; i++) {
             this.customers = new ArrayList<>();
-            this.addresses = new HashSet<>();
-            final AddressDTO newAddress = AddressDTO.builder().country(this.faker.address().country())
-                    .state(this.faker.address().state())
-                    .city(this.faker.address().city())
-                    .street(this.faker.address().streetName())
-                    .streetNumber(Integer.parseInt(this.faker.address().streetAddressNumber()))
-                    .postalCode(this.faker.address().zipCode())
+            Set<AddressDTO> addresses = new HashSet<>();
+            final AddressDTO newAddress = AddressDTO.builder().country(faker.address().country())
+                    .state(faker.address().state())
+                    .city(faker.address().city())
+                    .street(faker.address().streetName())
+                    .streetNumber(Integer.parseInt(faker.address().streetAddressNumber()))
+                    .postalCode(faker.address().zipCode())
                     .build();
-            this.addresses.add(newAddress);
-            final CustomerDTO newCustomer = CustomerDTO.builder().taxCode(this.faker.code().isbn10())
-                    .firstName(this.faker.name().firstName())
-                    .lastName(this.faker.name().lastName())
-                    .email(this.faker.internet().emailAddress())
-                    .birthDate(this.faker.date().birthday())
-                    .emailVerifiedAt(this.faker.date().birthday())
-                    .password(this.faker.internet().password())
-                    .idCard(this.faker.file().toString())
-                    .addresses(this.addresses)
+            addresses.add(newAddress);
+            final CustomerDTO newCustomer = CustomerDTO.builder().taxCode(faker.code().isbn10())
+                    .firstName(faker.name().firstName())
+                    .lastName(faker.name().lastName())
+                    .email(faker.internet().emailAddress())
+                    .birthDate(faker.date().birthday())
+                    .emailVerifiedAt(faker.date().birthday())
+                    .password(faker.internet().password())
+                    .idCard(faker.file().toString())
+                    .addresses(addresses)
                     .build();
             this.customers.add(newCustomer);
         }
@@ -83,7 +76,7 @@ public class FindAllTest {
                 .totalPages(0)
                 .content(new ArrayList<>())
                 .build();
-        when(this.customerService.getAllCustomers(Pageable.ofSize(10))).thenReturn(response);
+        when(this.customerService.getAllCustomers(PageRequest.of(1, 10))).thenReturn(response);
 
         ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/customers")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -101,7 +94,7 @@ public class FindAllTest {
                 .totalPages(1)
                 .content(this.customers)
                 .build();
-        when(this.customerService.getAllCustomers(Pageable.ofSize(10))).thenReturn(response);
+        when(this.customerService.getAllCustomers(PageRequest.of(1, 10))).thenReturn(response);
 
         ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/customers")
                 .contentType(MediaType.APPLICATION_JSON)
