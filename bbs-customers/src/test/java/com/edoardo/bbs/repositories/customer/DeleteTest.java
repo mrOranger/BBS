@@ -32,7 +32,7 @@ public class DeleteTest {
     }
 
     @Test
-    public void CustomerRepository_delete_withoutAddress_ReturnsCustomer () {
+    public void deleteCustomerWithoutAddress () {
         final Customer newCustomer = Customer.builder().taxCode(this.faker.code().isbn10())
                 .firstName(this.faker.name().firstName())
                 .lastName(this.faker.name().lastName())
@@ -53,7 +53,7 @@ public class DeleteTest {
     }
 
     @Test
-    public void CustomerRepository_delete_withAddress_ReturnsCustomer () {
+    public void deleteCustomerWithAddress () {
         final Address address = Address.builder().country(this.faker.address().country())
                 .state(this.faker.address().state())
                 .city(this.faker.address().city())

@@ -17,7 +17,7 @@ import java.util.List;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
-public class FirstByBirthDateTest {
+public class FindByBirthDateTest {
 
     private final Faker faker;
     private int maxRandomElements;
@@ -25,7 +25,7 @@ public class FirstByBirthDateTest {
     private final CustomerRepository customerRepository;
 
     @Autowired
-    public FirstByBirthDateTest(CustomerRepository customerRepository) {
+    public FindByBirthDateTest(CustomerRepository customerRepository) {
         this.customerRepository = customerRepository;
         this.faker = new Faker();
     }
@@ -36,7 +36,7 @@ public class FirstByBirthDateTest {
     }
 
     @Test
-    public void CustomerRepository_findByBirthDate_ReturnsEmptyList () {
+    public void findByBirthDateReturnsEmptySet () {
         final Date birthDate = this.faker.date().birthday();
 
         final List<Customer> customers = this.customerRepository.findByBirthDate(birthDate);
@@ -45,7 +45,7 @@ public class FirstByBirthDateTest {
     }
 
     @Test
-    public void CustomerRepository_findByBirthDate_ReturnsOneCustomer () {
+    public void findByBirthDateReturnsOneCustomer () {
         final Date birthDate = this.faker.date().birthday();
         final Customer newCustomer = Customer.builder().taxCode(this.faker.code().isbn10())
                 .firstName(this.faker.name().firstName())
@@ -64,7 +64,7 @@ public class FirstByBirthDateTest {
     }
 
     @Test
-    public void CustomerRepository_findByBirthDate_ReturnsManyCustomer () {
+    public void findByBirthDateReturnsManyCustomers () {
         final Date birthDate = this.faker.date().birthday();
         for (int i = 0; i < this.maxRandomElements; i++) {
             final Customer newCustomer = Customer.builder().taxCode(this.faker.code().isbn10())

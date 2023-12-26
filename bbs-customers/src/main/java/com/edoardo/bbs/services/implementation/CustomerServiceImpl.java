@@ -1,10 +1,10 @@
 package com.edoardo.bbs.services.implementation;
 
-import com.edoardo.bbs.dtos.AddressDTO;
 import com.edoardo.bbs.dtos.CustomerDTO;
 import com.edoardo.bbs.dtos.CustomerResponse;
 import com.edoardo.bbs.entities.Address;
 import com.edoardo.bbs.entities.Customer;
+import com.edoardo.bbs.mapper.CustomerMapper;
 import com.edoardo.bbs.repositories.CustomerRepository;
 import com.edoardo.bbs.services.CustomerService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,17 +18,19 @@ import java.util.*;
 public class CustomerServiceImpl implements CustomerService {
 
     private final CustomerRepository customerRepository;
+    private final CustomerMapper customerModelMapper;
 
     @Autowired
-    public CustomerServiceImpl (CustomerRepository customerRepository) {
+    public CustomerServiceImpl (CustomerRepository customerRepository, CustomerMapper customerModelMapper) {
         this.customerRepository = customerRepository;
+        this.customerModelMapper = customerModelMapper;
     }
 
     @Override
     public CustomerResponse getAllCustomers(Pageable pageable) {
         final Page<Customer> customers = this.customerRepository.findAll(pageable);
         final List<Customer> customersList = customers.getContent();
-        final List<CustomerDTO> customerDTOList = customersList.stream().map(this::mapToDto).toList();
+        final List<CustomerDTO> customerDTOList = customersList.stream().map(this.customerModelMapper::convertToDTO).toList();
 
         return CustomerResponse.builder()
                 .content(customerDTOList)
@@ -43,21 +45,21 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public List<CustomerDTO> getCustomersByFirstNameAndLastName(String firstName, String lastName) {
         return this.customerRepository.findByFirstNameAndLastName(firstName, lastName).stream()
-                .map(this::mapToDto)
+                .map(this.customerModelMapper::convertToDTO)
                 .toList();
     }
 
     @Override
     public List<CustomerDTO> getCustomersByBirthDate(Date birthDate) {
         return this.customerRepository.findByBirthDate(birthDate).stream()
-                .map(this::mapToDto)
+                .map(this.customerModelMapper::convertToDTO)
                 .toList();
     }
 
     @Override
     public CustomerDTO getCustomerByTaxCode(String taxCode) {
         final Optional<Customer> customer = this.customerRepository.findById(taxCode);
-        return customer.map(this::mapToDto).orElse(null);
+        return customer.map(this.customerModelMapper::convertToDTO).orElse(null);
     }
 
     @Override
@@ -86,7 +88,7 @@ public class CustomerServiceImpl implements CustomerService {
                 .addresses(addresses)
                 .build();
 
-        return this.mapToDto(this.customerRepository.save(customerEntity));
+        return this.customerModelMapper.convertToDTO(this.customerRepository.save(customerEntity));
     }
 
     @Override
@@ -102,35 +104,6 @@ public class CustomerServiceImpl implements CustomerService {
     public CustomerDTO deleteCustomer(CustomerDTO customer) {
         final Optional<Customer> existingCustomer = this.customerRepository.findById(customer.getTaxCode());
         existingCustomer.ifPresent(this.customerRepository::delete);
-        return null;
-    }
-
-    private CustomerDTO mapToDto(Customer customer) {
-        if (customer != null) {
-            final Set<AddressDTO> addresses = new HashSet<>();
-            customer.getAddresses().forEach((entity) -> {
-                final AddressDTO address = AddressDTO.builder()
-                        .country(entity.getCountry())
-                        .state(entity.getState())
-                        .city(entity.getCity())
-                        .street(entity.getStreet())
-                        .streetNumber(entity.getStreetNumber())
-                        .postalCode(entity.getPostalCode())
-                        .build();
-                addresses.add(address);
-            });
-            return CustomerDTO.builder()
-                    .taxCode(customer.getTaxCode())
-                    .firstName(customer.getFirstName())
-                    .lastName(customer.getLastName())
-                    .birthDate(customer.getBirthDate())
-                    .email(customer.getEmail())
-                    .emailVerifiedAt(customer.getEmailVerifiedAt())
-                    .password(customer.getPassword())
-                    .idCard(customer.getIdCard())
-                    .addresses(addresses)
-                    .build();
-        }
         return null;
     }
 }

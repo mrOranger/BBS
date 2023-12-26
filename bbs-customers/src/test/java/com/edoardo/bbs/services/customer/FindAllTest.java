@@ -2,6 +2,7 @@ package com.edoardo.bbs.services.customer;
 
 import com.edoardo.bbs.dtos.CustomerResponse;
 import com.edoardo.bbs.entities.Customer;
+import com.edoardo.bbs.mapper.CustomerMapper;
 import com.edoardo.bbs.repositories.CustomerRepository;
 import com.edoardo.bbs.services.implementation.CustomerServiceImpl;
 import com.github.javafaker.Faker;
@@ -25,8 +26,9 @@ public class FindAllTest {
     private final Pageable pageable;
 
     @Mock
+    private CustomerMapper customerMapper;
+    @Mock
     private CustomerRepository customerRepository;
-
     @InjectMocks
     private CustomerServiceImpl customerService;
 
@@ -37,7 +39,7 @@ public class FindAllTest {
     }
 
     @Test
-    public void CustomerService_findAll_returnsEmptyCustomerList () {
+    public void findAllCustomersReturnsEmptySet () {
         final Page<Customer> customers = Mockito.mock(Page.class);
 
         when(this.customerRepository.findAll(Mockito.any(Pageable.class))).thenReturn(customers);
@@ -47,7 +49,7 @@ public class FindAllTest {
     }
 
     @Test
-    public void CustomerService_findAll_returnsOneCustomer () {
+    public void findAllCustomersReturnsOneCustomer () {
         final Page<Customer> customers = Mockito.mock(Page.class);
         final Customer newCustomer = Customer.builder().taxCode(this.faker.code().isbn10())
                 .firstName(this.faker.name().firstName())
@@ -69,7 +71,7 @@ public class FindAllTest {
     }
 
     @Test
-    public void CustomerService_findAll_returnsManyCustomers () {
+    public void findAllCustomersReturnsManyCustomers () {
         final Page<Customer> customers = Mockito.mock(Page.class);
         for (int i = 0; i < this.maxRandomElements; i++) {
             final Customer newCustomer = Customer.builder().taxCode(this.faker.code().isbn10())

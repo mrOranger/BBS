@@ -4,6 +4,7 @@ import com.edoardo.bbs.dtos.AddressDTO;
 import com.edoardo.bbs.dtos.CustomerDTO;
 import com.edoardo.bbs.entities.Address;
 import com.edoardo.bbs.entities.Customer;
+import com.edoardo.bbs.mapper.CustomerMapper;
 import com.edoardo.bbs.repositories.CustomerRepository;
 import com.edoardo.bbs.services.implementation.CustomerServiceImpl;
 import com.github.javafaker.Faker;
@@ -25,8 +26,9 @@ import static org.mockito.Mockito.when;
 public class SaveTest {
 
     @Mock
+    private CustomerMapper customerMapper;
+    @Mock
     private CustomerRepository customerRepository;
-
     @InjectMocks
     private CustomerServiceImpl customerService;
 
@@ -39,7 +41,7 @@ public class SaveTest {
     }
 
     @Test
-    public void CustomerRepository_save_withoutAddress_returnsCustomer () {
+    public void saveCustomerWithoutAddress () {
         final Customer newCustomer = Customer.builder().taxCode(this.faker.code().isbn10())
                 .firstName(this.faker.name().firstName())
                 .lastName(this.faker.name().lastName())
@@ -51,6 +53,7 @@ public class SaveTest {
                 .addresses(new HashSet<>())
                 .build();
 
+        when(this.customerMapper.convertToDTO(newCustomer)).thenReturn(this.mapToDto(newCustomer));
         when(this.customerRepository.save(Mockito.any(Customer.class))).thenReturn(newCustomer);
         final CustomerDTO customer = this.customerService.createCustomer(this.mapToDto(newCustomer));
 
@@ -67,7 +70,7 @@ public class SaveTest {
     }
 
     @Test
-    public void CustomerRepository_save_withAddress_returnsCustomer () {
+    public void saveCustomerWithAddress () {
         final Address address = Address.builder().country(this.faker.address().country())
                 .state(this.faker.address().state())
                 .city(this.faker.address().city())
@@ -86,6 +89,7 @@ public class SaveTest {
                 .addresses(Set.of(address))
                 .build();
 
+        when(this.customerMapper.convertToDTO(newCustomer)).thenReturn(this.mapToDto(newCustomer));
         when(this.customerRepository.save(Mockito.any(Customer.class))).thenReturn(newCustomer);
         final CustomerDTO customer = this.customerService.createCustomer(this.mapToDto(newCustomer));
 
@@ -104,17 +108,19 @@ public class SaveTest {
     private CustomerDTO mapToDto(Customer customer) {
         if (customer != null) {
             final Set<AddressDTO> addresses = new HashSet<>();
-            customer.getAddresses().forEach((entity) -> {
-                final AddressDTO address = AddressDTO.builder()
-                        .country(entity.getCountry())
-                        .state(entity.getState())
-                        .city(entity.getCity())
-                        .street(entity.getStreet())
-                        .streetNumber(entity.getStreetNumber())
-                        .postalCode(entity.getPostalCode())
-                        .build();
-                addresses.add(address);
-            });
+            if (customer.getAddresses() != null) {
+                customer.getAddresses().forEach((entity) -> {
+                    final AddressDTO address = AddressDTO.builder()
+                            .country(entity.getCountry())
+                            .state(entity.getState())
+                            .city(entity.getCity())
+                            .street(entity.getStreet())
+                            .streetNumber(entity.getStreetNumber())
+                            .postalCode(entity.getPostalCode())
+                            .build();
+                    addresses.add(address);
+                });
+            }
             return CustomerDTO.builder()
                     .taxCode(customer.getTaxCode())
                     .firstName(customer.getFirstName())

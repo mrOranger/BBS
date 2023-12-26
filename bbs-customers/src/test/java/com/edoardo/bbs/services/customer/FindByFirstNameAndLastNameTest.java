@@ -1,8 +1,10 @@
 package com.edoardo.bbs.services.customer;
 
 
+import com.edoardo.bbs.dtos.AddressDTO;
 import com.edoardo.bbs.dtos.CustomerDTO;
 import com.edoardo.bbs.entities.Customer;
+import com.edoardo.bbs.mapper.CustomerMapper;
 import com.edoardo.bbs.repositories.CustomerRepository;
 import com.edoardo.bbs.services.implementation.CustomerServiceImpl;
 import com.github.javafaker.Faker;
@@ -16,7 +18,9 @@ import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import static org.mockito.Mockito.when;
 
@@ -24,8 +28,9 @@ import static org.mockito.Mockito.when;
 public class FindByFirstNameAndLastNameTest {
 
     @Mock
+    private CustomerMapper customerMapper;
+    @Mock
     private CustomerRepository customerRepository;
-
     @InjectMocks
     private CustomerServiceImpl customerService;
 
@@ -40,7 +45,7 @@ public class FindByFirstNameAndLastNameTest {
     }
 
     @Test
-    public void CustomerRepository_findByFirstNameAndLastName_returnsNoCustomer () {
+    public void findByBirthDateReturnsEmptySet () {
         final String firstName = this.faker.name().firstName();
         final String lastName = this.faker.name().lastName();
 
@@ -51,7 +56,7 @@ public class FindByFirstNameAndLastNameTest {
     }
 
     @Test
-    public void CustomerRepository_findByFirstNameAndLastname_returnsOneCustomer () {
+    public void findByBirthDateReturnsOneCustomer () {
         final String firstName = this.faker.name().firstName();
         final String lastName = this.faker.name().lastName();
         final Customer newCustomer = Customer.builder().taxCode(this.faker.code().isbn10())
@@ -64,6 +69,7 @@ public class FindByFirstNameAndLastNameTest {
                 .idCard(this.faker.file().toString())
                 .build();
 
+        when(this.customerMapper.convertToDTO(newCustomer)).thenReturn(this.mapToDto(newCustomer));
         when(this.customerRepository.findByFirstNameAndLastName(firstName, lastName)).thenReturn(List.of(newCustomer));
         final List<CustomerDTO> customers = this.customerService.getCustomersByFirstNameAndLastName(firstName, lastName);
 
@@ -74,7 +80,7 @@ public class FindByFirstNameAndLastNameTest {
     }
 
     @Test
-    public void CustomerRepository_findByFirstNameAndLastName_returnsManyCustomers () {
+    public void findByBirthDateReturnsManyCustomers () {
         final String firstName = this.faker.name().firstName();
         final String lastName = this.faker.name().lastName();
         final List<Customer> customers = new ArrayList<>();
@@ -88,6 +94,7 @@ public class FindByFirstNameAndLastNameTest {
                     .password(this.faker.internet().password())
                     .idCard(this.faker.file().toString())
                     .build();
+            when(this.customerMapper.convertToDTO(newCustomer)).thenReturn(this.mapToDto(newCustomer));
             when(this.customerRepository.save(Mockito.any(Customer.class))).thenReturn(newCustomer);
             this.customerRepository.save(newCustomer);
 
@@ -101,5 +108,36 @@ public class FindByFirstNameAndLastNameTest {
         Assertions.assertThat(savedCustomers).isNotNull();
         Assertions.assertThat(savedCustomers.isEmpty()).isFalse();
         Assertions.assertThat(savedCustomers.size()).isEqualTo(this.maxRandomElements);
+    }
+
+    private CustomerDTO mapToDto(Customer customer) {
+        if (customer != null) {
+            final Set<AddressDTO> addresses = new HashSet<>();
+            if (customer.getAddresses() != null) {
+                customer.getAddresses().forEach((entity) -> {
+                    final AddressDTO address = AddressDTO.builder()
+                            .country(entity.getCountry())
+                            .state(entity.getState())
+                            .city(entity.getCity())
+                            .street(entity.getStreet())
+                            .streetNumber(entity.getStreetNumber())
+                            .postalCode(entity.getPostalCode())
+                            .build();
+                    addresses.add(address);
+                });
+            }
+            return CustomerDTO.builder()
+                    .taxCode(customer.getTaxCode())
+                    .firstName(customer.getFirstName())
+                    .lastName(customer.getLastName())
+                    .birthDate(customer.getBirthDate())
+                    .email(customer.getEmail())
+                    .emailVerifiedAt(customer.getEmailVerifiedAt())
+                    .password(customer.getPassword())
+                    .idCard(customer.getIdCard())
+                    .addresses(addresses)
+                    .build();
+        }
+        return null;
     }
 }

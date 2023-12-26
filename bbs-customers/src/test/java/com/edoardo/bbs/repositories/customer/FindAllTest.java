@@ -32,14 +32,14 @@ public class FindAllTest {
     }
 
     @Test
-    public void CustomerRepository_findAll_ReturnsEmptyList () {
+    public void findAllCustomersReturnsEmptySet () {
         final List<Customer> customers = this.customerRepository.findAll();
 
         Assertions.assertThat(customers.size()).isEqualTo(0);
     }
 
     @Test
-    public void CustomerRepository_findAll_ReturnsOneCustomerList () {
+    public void findAllCustomersReturnsOneCustomer () {
         final Customer newCustomer = Customer.builder().taxCode(this.faker.code().isbn10())
                 .firstName(this.faker.name().firstName())
                 .lastName(this.faker.name().lastName())
@@ -57,7 +57,7 @@ public class FindAllTest {
     }
 
     @Test
-    public void CustomerRepository_findAll_ReturnsManyCustomersList () {
+    public void findAllCustomersReturnsManyCustomers () {
         for (int i = 0; i < this.maxRandomElements; i++) {
             final Customer newCustomer = Customer.builder().taxCode(this.faker.code().isbn10())
                     .firstName(this.faker.name().firstName())

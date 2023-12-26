@@ -30,7 +30,7 @@ public class SaveTest {
     }
 
     @Test
-    public void CustomerRepository_save_withoutAddress_ReturnsCustomer () {
+    public void saveCustomerWithoutAddress () {
         final Customer newCustomer = Customer.builder().taxCode(this.faker.code().isbn10())
                 .firstName(this.faker.name().firstName())
                 .lastName(this.faker.name().lastName())
@@ -57,7 +57,7 @@ public class SaveTest {
     }
 
     @Test
-    public void CustomerRepository_save_withAddress_ReturnsCustomer () {
+    public void saveCustomerWithAddress () {
         final Address address = Address.builder().country(this.faker.address().country())
                 .state(this.faker.address().state())
                 .city(this.faker.address().city())

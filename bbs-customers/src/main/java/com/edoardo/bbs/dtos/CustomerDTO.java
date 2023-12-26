@@ -19,5 +19,5 @@ public class CustomerDTO {
     private String password;
     private String idCard;
 
-    private Set<AddressDTO> addresses = new HashSet<>();
+    private Set<AddressDTO> addresses;
 }

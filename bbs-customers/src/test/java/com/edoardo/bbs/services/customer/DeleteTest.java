@@ -3,6 +3,7 @@ package com.edoardo.bbs.services.customer;
 import com.edoardo.bbs.dtos.AddressDTO;
 import com.edoardo.bbs.dtos.CustomerDTO;
 import com.edoardo.bbs.entities.Customer;
+import com.edoardo.bbs.mapper.CustomerMapper;
 import com.edoardo.bbs.repositories.CustomerRepository;
 import com.edoardo.bbs.services.implementation.CustomerServiceImpl;
 import com.github.javafaker.Faker;
@@ -24,11 +25,11 @@ import static org.mockito.Mockito.when;
 public class DeleteTest {
 
     @Mock
+    private CustomerMapper customerMapper;
+    @Mock
     private CustomerRepository customerRepository;
-
     @InjectMocks
     private CustomerServiceImpl customerService;
-
 
     private Faker faker;
 
@@ -38,7 +39,7 @@ public class DeleteTest {
     }
 
     @Test
-    public void CustomerRepository_delete_returnsNull () {
+    public void deleteCustomerReturnsCustomer () {
         final Customer newCustomer = Customer.builder().taxCode(this.faker.code().isbn10())
                 .firstName(this.faker.name().firstName())
                 .lastName(this.faker.name().lastName())
@@ -51,11 +52,11 @@ public class DeleteTest {
                 .build();
 
         when(this.customerRepository.findById(newCustomer.getTaxCode())).thenReturn(Optional.of(newCustomer));
-        Assertions.assertAll(() -> this.customerService.deleteCustomer(this.mapToDto(newCustomer)));
+        Assertions.assertAll(() -> this.customerService.deleteCustomer(this.convertToDTO(newCustomer)));
     }
 
     @Test
-    public void CustomerRepository_delete_returnsCustomer () {
+    public void deleteCustomerReturnsNull () {
         final Customer newCustomer = Customer.builder().taxCode(this.faker.code().isbn10())
                 .firstName(this.faker.name().firstName())
                 .lastName(this.faker.name().lastName())
@@ -68,32 +69,30 @@ public class DeleteTest {
                 .build();
 
         when(this.customerRepository.findById(newCustomer.getTaxCode())).thenReturn(Optional.empty());
-        Assertions.assertAll(() -> this.customerService.deleteCustomer(this.mapToDto(newCustomer)));
+        Assertions.assertAll(() -> this.customerService.deleteCustomer(this.convertToDTO(newCustomer)));
     }
 
-    private CustomerDTO mapToDto(Customer customer) {
+    private CustomerDTO convertToDTO (Customer customer) {
         if (customer != null) {
             final Set<AddressDTO> addresses = new HashSet<>();
-            customer.getAddresses().forEach((entity) -> {
-                final AddressDTO address = AddressDTO.builder()
-                        .country(entity.getCountry())
-                        .state(entity.getState())
-                        .city(entity.getCity())
-                        .street(entity.getStreet())
-                        .streetNumber(entity.getStreetNumber())
-                        .postalCode(entity.getPostalCode())
+            customer.getAddresses().forEach((address -> {
+                final AddressDTO addressDTO = AddressDTO.builder().country(address.getCountry())
+                        .state(address.getState())
+                        .city(address.getCity())
+                        .street(address.getStreet())
+                        .streetNumber(address.getStreetNumber())
+                        .postalCode(address.getPostalCode())
                         .build();
-                addresses.add(address);
-            });
+                addresses.add(addressDTO);
+            }));
             return CustomerDTO.builder()
                     .taxCode(customer.getTaxCode())
-                    .firstName(customer.getFirstName())
+                    .firstName(customer.getTaxCode())
                     .lastName(customer.getLastName())
                     .birthDate(customer.getBirthDate())
                     .email(customer.getEmail())
-                    .emailVerifiedAt(customer.getEmailVerifiedAt())
                     .password(customer.getPassword())
-                    .idCard(customer.getIdCard())
+                    .emailVerifiedAt(customer.getEmailVerifiedAt())
                     .addresses(addresses)
                     .build();
         }

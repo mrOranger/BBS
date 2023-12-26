@@ -34,7 +34,7 @@ public class FindByFirstNameAndLastNameTest {
     }
 
     @Test
-    public void CustomerRepository_findByFirstNameAndLastName_ReturnsEmptyList () {
+    public void findByFirstNameAndLastNameReturnsEmptySet () {
         final String firstName = this.faker.name().firstName();
         final String lastname = this.faker.name().lastName();
 
@@ -44,7 +44,7 @@ public class FindByFirstNameAndLastNameTest {
     }
 
     @Test
-    public void CustomerRepository_findByFirstNameAndLastName_ReturnsOneCustomer () {
+    public void findByFirstNameAndLastNameReturnsOneCustomer () {
         final String firstName = this.faker.name().firstName();
         final String lastname = this.faker.name().lastName();
         final Customer newCustomer = Customer.builder().taxCode(this.faker.code().isbn10())
@@ -65,7 +65,7 @@ public class FindByFirstNameAndLastNameTest {
     }
 
     @Test
-    public void CustomerRepository_findByFirstNameAndLastName_ReturnsManyCustomers () {
+    public void findByFirstNameAndLastNameReturnsManyCustomers () {
         final String firstName = this.faker.name().firstName();
         final String lastname = this.faker.name().lastName();
         for (int i = 0; i < this.maxRandomElements; i++) {

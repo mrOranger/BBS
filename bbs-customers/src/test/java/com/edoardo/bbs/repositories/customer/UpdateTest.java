@@ -31,7 +31,7 @@ public class UpdateTest {
     }
 
     @Test
-    public void CustomerRepository_update_withoutAddress_ReturnsCustomer () {
+    public void updateCustomerWithoutAddress () {
         final Customer newCustomer = Customer.builder().taxCode(this.faker.code().isbn10())
                 .firstName(this.faker.name().firstName())
                 .lastName(this.faker.name().lastName())
@@ -62,7 +62,7 @@ public class UpdateTest {
     }
 
     @Test
-    public void CustomerRepository_update_withAddress_ReturnsCustomer () {
+    public void updateCustomerWithAddress () {
         final Address address = Address.builder().country(this.faker.address().country())
                 .state(this.faker.address().state())
                 .city(this.faker.address().city())

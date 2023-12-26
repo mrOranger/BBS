@@ -4,6 +4,7 @@ import com.edoardo.bbs.dtos.AddressDTO;
 import com.edoardo.bbs.dtos.CustomerDTO;
 import com.edoardo.bbs.entities.Address;
 import com.edoardo.bbs.entities.Customer;
+import com.edoardo.bbs.mapper.CustomerMapper;
 import com.edoardo.bbs.repositories.CustomerRepository;
 import com.edoardo.bbs.services.implementation.CustomerServiceImpl;
 import com.github.javafaker.Faker;
@@ -26,8 +27,9 @@ import static org.mockito.Mockito.when;
 public class UpdateTest {
 
     @Mock
+    private CustomerMapper customerMapper;
+    @Mock
     private CustomerRepository customerRepository;
-
     @InjectMocks
     private CustomerServiceImpl customerService;
 
@@ -40,7 +42,25 @@ public class UpdateTest {
     }
 
     @Test
-    public void CustomerRepository_update_withoutAddress_returnsCustomer () {
+    public void updateCustomerWithoutAddress () {
+        final Customer customer = Customer.builder().taxCode(this.faker.code().isbn10())
+                .firstName(this.faker.name().firstName())
+                .lastName(this.faker.name().lastName())
+                .birthDate(this.faker.date().birthday())
+                .email(this.faker.internet().emailAddress())
+                .emailVerifiedAt(this.faker.date().birthday())
+                .password(this.faker.internet().password())
+                .idCard(this.faker.file().toString())
+                .addresses(new HashSet<>())
+                .build();
+        when(this.customerRepository.findById(customer.getTaxCode())).thenReturn(Optional.empty());
+        final CustomerDTO updatedCustomer = this.customerService.updateCustomer(this.mapToDto(customer));
+
+        assertThat(updatedCustomer).isNull();
+    }
+
+    @Test
+    public void updateCustomerWithAddress () {
         final Customer customer = Customer.builder().taxCode(this.faker.code().isbn10())
                 .firstName(this.faker.name().firstName())
                 .lastName(this.faker.name().lastName())
@@ -52,6 +72,7 @@ public class UpdateTest {
                 .addresses(new HashSet<>())
                 .build();
 
+        when(this.customerMapper.convertToDTO(customer)).thenReturn(this.mapToDto(customer));
         when(this.customerRepository.findById(customer.getTaxCode())).thenReturn(Optional.of(customer));
         when(this.customerRepository.save(Mockito.any(Customer.class))).thenReturn(customer);
         final CustomerDTO updatedCustomer = this.customerService.updateCustomer(this.mapToDto(customer));
@@ -88,6 +109,7 @@ public class UpdateTest {
                 .addresses(Set.of(address))
                 .build();
 
+        when(this.customerMapper.convertToDTO(customer)).thenReturn(this.mapToDto(customer));
         when(this.customerRepository.findById(customer.getTaxCode())).thenReturn(Optional.of(customer));
         when(this.customerRepository.save(Mockito.any(Customer.class))).thenReturn(customer);
         final CustomerDTO updatedCustomer = this.customerService.updateCustomer(this.mapToDto(customer));

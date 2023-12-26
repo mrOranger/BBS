@@ -26,14 +26,14 @@ public class FindByIdTest {
     }
 
     @Test
-    public void CustomerRepository_findById_ReturnsNoCustomer () {
+    public void findByIdReturnsNoneCustomer () {
         final Optional<Customer> customer = this.customerRepository.findById(this.faker.code().isbn10());
 
         Assertions.assertThat(customer.isEmpty()).isEqualTo(true);
     }
 
     @Test
-    public void CustomerRepository_findById_ReturnsOneCustomer () {
+    public void findByIdReturnsOneCustomer () {
         final Customer newCustomer = Customer.builder().taxCode(this.faker.code().isbn10())
                 .firstName(this.faker.name().firstName())
                 .lastName(this.faker.name().lastName())
