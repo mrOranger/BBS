@@ -99,8 +99,10 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public void deleteCustomer(CustomerDTO customer) {
-
+    public CustomerDTO deleteCustomer(CustomerDTO customer) {
+        final Optional<Customer> existingCustomer = this.customerRepository.findById(customer.getTaxCode());
+        existingCustomer.ifPresent(this.customerRepository::delete);
+        return null;
     }
 
     private CustomerDTO mapToDto(Customer customer) {
