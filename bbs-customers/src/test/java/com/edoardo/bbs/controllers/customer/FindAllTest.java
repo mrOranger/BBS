@@ -22,6 +22,7 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -59,8 +60,8 @@ public class FindAllTest {
                     .firstName(faker.name().firstName())
                     .lastName(faker.name().lastName())
                     .email(faker.internet().emailAddress())
-                    .birthDate(faker.date().birthday())
-                    .emailVerifiedAt(faker.date().birthday())
+                    .birthDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
+                    .emailVerifiedAt(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
                     .password(faker.internet().password())
                     .idCard(faker.file().toString())
                     .addresses(addresses)

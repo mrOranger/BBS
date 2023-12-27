@@ -12,6 +12,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.*;
 
 @Service
@@ -50,7 +51,7 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public List<CustomerDTO> getCustomersByBirthDate(Date birthDate) {
+    public List<CustomerDTO> getCustomersByBirthDate(LocalDate birthDate) {
         return this.customerRepository.findByBirthDate(birthDate).stream()
                 .map(this.customerModelMapper::convertToDTO)
                 .toList();

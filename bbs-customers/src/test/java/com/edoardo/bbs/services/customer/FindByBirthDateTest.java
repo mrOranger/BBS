@@ -16,6 +16,8 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 
 import static org.mockito.Mockito.when;
@@ -42,7 +44,7 @@ public class FindByBirthDateTest {
 
     @Test
     public void findByBirthDateReturnsEmptySet() {
-        final Date birthDate = this.faker.date().birthday();
+        final LocalDate birthDate = this.faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
         final List<CustomerDTO> customers = this.customerService.getCustomersByBirthDate(birthDate);
 
@@ -52,13 +54,13 @@ public class FindByBirthDateTest {
 
     @Test
     public void findByBirthDateReturnsOneCustomer () {
-        final Date birthDate = this.faker.date().birthday();
+        final LocalDate birthDate = this.faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         final Customer newCustomer = Customer.builder().taxCode(this.faker.code().isbn10())
                 .firstName(this.faker.name().firstName())
                 .lastName(this.faker.name().lastName())
-                .birthDate(this.faker.date().birthday())
+                .birthDate(this.faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
                 .email(this.faker.internet().emailAddress())
-                .emailVerifiedAt(this.faker.date().birthday())
+                .emailVerifiedAt(this.faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
                 .password(this.faker.internet().password())
                 .idCard(this.faker.file().toString())
                 .build();
@@ -75,15 +77,15 @@ public class FindByBirthDateTest {
 
     @Test
     public void findByBirthDateReturnsManyCustomers () {
-        final Date birthDate = this.faker.date().birthday();
+        final LocalDate birthDate = this.faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         final List<Customer> customers = new ArrayList<>();
         for (int i = 0; i < this.maxRandomElements; i++) {
             final Customer newCustomer = Customer.builder().taxCode(this.faker.code().isbn10())
                     .firstName(this.faker.name().firstName())
                     .lastName(this.faker.name().lastName())
-                    .birthDate(this.faker.date().birthday())
+                    .birthDate(this.faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
                     .email(this.faker.internet().emailAddress())
-                    .emailVerifiedAt(this.faker.date().birthday())
+                    .emailVerifiedAt(this.faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
                     .password(this.faker.internet().password())
                     .idCard(this.faker.file().toString())
                     .build();

@@ -16,6 +16,7 @@ import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
+import java.time.ZoneId;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -45,9 +46,9 @@ public class SaveTest {
         final Customer newCustomer = Customer.builder().taxCode(this.faker.code().isbn10())
                 .firstName(this.faker.name().firstName())
                 .lastName(this.faker.name().lastName())
-                .birthDate(this.faker.date().birthday())
+                .birthDate(this.faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
                 .email(this.faker.internet().emailAddress())
-                .emailVerifiedAt(this.faker.date().birthday())
+                .emailVerifiedAt(this.faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
                 .password(this.faker.internet().password())
                 .idCard(this.faker.file().toString())
                 .addresses(new HashSet<>())
@@ -81,9 +82,9 @@ public class SaveTest {
         final Customer newCustomer = Customer.builder().taxCode(this.faker.code().isbn10())
                 .firstName(this.faker.name().firstName())
                 .lastName(this.faker.name().lastName())
-                .birthDate(this.faker.date().birthday())
+                .birthDate(this.faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
                 .email(this.faker.internet().emailAddress())
-                .emailVerifiedAt(this.faker.date().birthday())
+                .emailVerifiedAt(this.faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
                 .password(this.faker.internet().password())
                 .idCard(this.faker.file().toString())
                 .addresses(Set.of(address))

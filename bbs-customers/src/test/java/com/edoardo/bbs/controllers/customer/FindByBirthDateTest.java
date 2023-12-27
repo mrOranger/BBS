@@ -20,6 +20,8 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.*;
 
 import static org.mockito.Mockito.when;
@@ -55,8 +57,8 @@ public class FindByBirthDateTest {
                     .firstName(faker.name().firstName())
                     .lastName(faker.name().lastName())
                     .email(faker.internet().emailAddress())
-                    .birthDate(faker.date().birthday())
-                    .emailVerifiedAt(faker.date().birthday())
+                    .birthDate(this.faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
+                    .emailVerifiedAt(this.faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
                     .password(faker.internet().password())
                     .idCard(faker.file().toString())
                     .addresses(addresses)
@@ -67,7 +69,7 @@ public class FindByBirthDateTest {
 
     @Test
     public void testGetAllCustomersByBirthDateReturnsEmptyResponse () throws Exception {
-        final Date birthDate = this.faker.date().birthday();
+        final LocalDate birthDate = this.faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         when(this.customerService.getCustomersByBirthDate(birthDate)).thenReturn(new ArrayList<>());
 
 
@@ -80,8 +82,8 @@ public class FindByBirthDateTest {
 
     @Test
     public void testGetAllCustomersByBirthDateReturnsManyCustomers () throws Exception {
-        final Date birthDate = this.faker.date().birthday();
-        when(this.customerService.getCustomersByBirthDate(birthDate)).thenReturn(new ArrayList<>());
+        final LocalDate birthDate = this.faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
+        when(this.customerService.getCustomersByBirthDate(birthDate)).thenReturn(this.customers);
 
         ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/customers/birthDate/{birthDate}", birthDate)
                 .contentType(MediaType.APPLICATION_JSON));

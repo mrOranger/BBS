@@ -16,6 +16,8 @@ import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
+import java.time.ZoneId;
+
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -54,9 +56,9 @@ public class FindAllTest {
         final Customer newCustomer = Customer.builder().taxCode(this.faker.code().isbn10())
                 .firstName(this.faker.name().firstName())
                 .lastName(this.faker.name().lastName())
-                .birthDate(this.faker.date().birthday())
+                .birthDate(this.faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
                 .email(this.faker.internet().emailAddress())
-                .emailVerifiedAt(this.faker.date().birthday())
+                .emailVerifiedAt(this.faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
                 .password(this.faker.internet().password())
                 .idCard(this.faker.file().toString())
                 .build();
@@ -77,9 +79,9 @@ public class FindAllTest {
             final Customer newCustomer = Customer.builder().taxCode(this.faker.code().isbn10())
                     .firstName(this.faker.name().firstName())
                     .lastName(this.faker.name().lastName())
-                    .birthDate(this.faker.date().birthday())
+                    .birthDate(this.faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
                     .email(this.faker.internet().emailAddress())
-                    .emailVerifiedAt(this.faker.date().birthday())
+                    .emailVerifiedAt(this.faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
                     .password(this.faker.internet().password())
                     .idCard(this.faker.file().toString())
                     .build();

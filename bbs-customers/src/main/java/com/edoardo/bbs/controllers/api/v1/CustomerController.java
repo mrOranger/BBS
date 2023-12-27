@@ -10,6 +10,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDate;
+import java.util.Date;
 import java.util.List;
 
 @RestController @RequestMapping("/api/v1") @Log
@@ -34,4 +36,10 @@ public class CustomerController {
         return ResponseEntity.ok(this.customerService.getCustomersByFirstNameAndLastName(firstName, lastName));
     }
 
+    @GetMapping(value = "/customers/birthDate/{birthDate}")
+    public ResponseEntity<List<CustomerDTO>> getCustomersByBirthDate (
+            @PathVariable LocalDate birthDate
+    ) {
+        return ResponseEntity.ok(this.customerService.getCustomersByBirthDate(birthDate));
+    }
 }

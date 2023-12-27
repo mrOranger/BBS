@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 
 import java.io.Serial;
 import java.io.Serializable;
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -29,14 +29,14 @@ public class Customer implements Serializable {
 
     @Column(name = "birth_date", nullable = false)
     @Temporal(TemporalType.DATE)
-    private Date birthDate;
+    private LocalDate birthDate;
 
     @Column(name = "email", nullable = false, unique = true, length = 50)
     private String email;
 
     @Column(name = "email_verified_at")
     @Temporal(TemporalType.DATE)
-    private Date emailVerifiedAt;
+    private LocalDate emailVerifiedAt;
 
     @Column(name = "password", nullable = false, length = 50)
     private String password;

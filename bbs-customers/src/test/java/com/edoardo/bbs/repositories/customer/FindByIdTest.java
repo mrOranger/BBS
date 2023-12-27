@@ -10,6 +10,7 @@ import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
+import java.time.ZoneId;
 import java.util.Optional;
 
 @DataJpaTest
@@ -37,9 +38,9 @@ public class FindByIdTest {
         final Customer newCustomer = Customer.builder().taxCode(this.faker.code().isbn10())
                 .firstName(this.faker.name().firstName())
                 .lastName(this.faker.name().lastName())
-                .birthDate(this.faker.date().birthday())
+                .birthDate(this.faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
                 .email(this.faker.internet().emailAddress())
-                .emailVerifiedAt(this.faker.date().birthday())
+                .emailVerifiedAt(this.faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
                 .password(this.faker.internet().password())
                 .idCard(this.faker.file().toString())
                 .build();

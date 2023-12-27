@@ -4,13 +4,13 @@ import com.edoardo.bbs.dtos.CustomerDTO;
 import com.edoardo.bbs.dtos.CustomerResponse;
 import org.springframework.data.domain.Pageable;
 
-import java.util.Date;
+import java.time.LocalDate;
 import java.util.List;
 
 public interface CustomerService {
     CustomerResponse getAllCustomers (Pageable pageable);
     List<CustomerDTO> getCustomersByFirstNameAndLastName (String firstName, String lastName);
-    List<CustomerDTO> getCustomersByBirthDate (Date birthDate);
+    List<CustomerDTO> getCustomersByBirthDate (LocalDate birthDate);
 
     CustomerDTO getCustomerByTaxCode (String taxCode);
 

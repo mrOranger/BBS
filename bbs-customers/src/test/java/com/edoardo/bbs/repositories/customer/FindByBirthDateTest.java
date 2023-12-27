@@ -12,7 +12,8 @@ import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
 import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
-import java.util.Date;
+import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 
 @DataJpaTest
@@ -37,7 +38,7 @@ public class FindByBirthDateTest {
 
     @Test
     public void findByBirthDateReturnsEmptySet () {
-        final Date birthDate = this.faker.date().birthday();
+        final LocalDate birthDate = this.faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
 
         final List<Customer> customers = this.customerRepository.findByBirthDate(birthDate);
 
@@ -46,13 +47,13 @@ public class FindByBirthDateTest {
 
     @Test
     public void findByBirthDateReturnsOneCustomer () {
-        final Date birthDate = this.faker.date().birthday();
+        final LocalDate birthDate = this.faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         final Customer newCustomer = Customer.builder().taxCode(this.faker.code().isbn10())
                 .firstName(this.faker.name().firstName())
                 .lastName(this.faker.name().lastName())
                 .birthDate(birthDate)
                 .email(this.faker.internet().emailAddress())
-                .emailVerifiedAt(this.faker.date().birthday())
+                .emailVerifiedAt(this.faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
                 .password(this.faker.internet().password())
                 .idCard(this.faker.file().toString())
                 .build();
@@ -65,14 +66,14 @@ public class FindByBirthDateTest {
 
     @Test
     public void findByBirthDateReturnsManyCustomers () {
-        final Date birthDate = this.faker.date().birthday();
+        final LocalDate birthDate = this.faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         for (int i = 0; i < this.maxRandomElements; i++) {
             final Customer newCustomer = Customer.builder().taxCode(this.faker.code().isbn10())
                     .firstName(this.faker.name().firstName())
                     .lastName(this.faker.name().lastName())
                     .birthDate(birthDate)
                     .email(this.faker.internet().emailAddress())
-                    .emailVerifiedAt(this.faker.date().birthday())
+                    .emailVerifiedAt(this.faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
                     .password(this.faker.internet().password())
                     .idCard(this.faker.file().toString())
                     .build();
