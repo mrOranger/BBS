@@ -4,9 +4,11 @@ import com.edoardo.bbs.dtos.CustomerDTO;
 import com.edoardo.bbs.dtos.CustomerResponse;
 import com.edoardo.bbs.entities.Address;
 import com.edoardo.bbs.entities.Customer;
+import com.edoardo.bbs.exceptions.ResourceNotFoundException;
 import com.edoardo.bbs.mapper.CustomerMapper;
 import com.edoardo.bbs.repositories.CustomerRepository;
 import com.edoardo.bbs.services.CustomerService;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -58,9 +60,12 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public CustomerDTO getCustomerByTaxCode(String taxCode) {
+    public CustomerDTO getCustomerByTaxCode(String taxCode) throws ResourceNotFoundException {
         final Optional<Customer> customer = this.customerRepository.findById(taxCode);
-        return customer.map(this.customerModelMapper::convertToDTO).orElse(null);
+        if (customer.isPresent()) {
+            return customer.map(this.customerModelMapper::convertToDTO).get();
+        }
+        throw new ResourceNotFoundException();
     }
 
     @Override

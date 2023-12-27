@@ -1,10 +1,11 @@
 package com.edoardo.bbs.exceptions;
 
-import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
-@Data
+@Getter @Setter
 public class ErrorResponse {
     private LocalDateTime date;
     private String message;

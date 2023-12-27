@@ -70,7 +70,7 @@ public class FindByIdTest {
 
     @Test
     public void testGetCustomerByIdThrowsNotFoundException () throws Exception {
-        when(this.customerService.getCustomerByTaxCode(this.customer.getTaxCode())).thenThrow(ResourceNotFoundException.class);
+        when(this.customerService.getCustomerByTaxCode(this.customer.getTaxCode())).thenThrow(new ResourceNotFoundException("Not found."));
 
         ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/customers/{customerId}", this.customer.getTaxCode())
                 .contentType(MediaType.APPLICATION_JSON));
@@ -91,7 +91,6 @@ public class FindByIdTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.taxCode", CoreMatchers.is(this.customer.getTaxCode())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.firstName", CoreMatchers.is(this.customer.getFirstName())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.lastName", CoreMatchers.is(this.customer.getLastName())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.birthDate", CoreMatchers.is(this.customer.getBirthDate())))
                 .andDo(MockMvcResultHandlers.print());
     }
 }

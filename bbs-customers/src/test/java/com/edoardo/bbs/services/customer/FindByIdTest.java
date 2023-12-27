@@ -4,6 +4,7 @@ package com.edoardo.bbs.services.customer;
 import com.edoardo.bbs.dtos.AddressDTO;
 import com.edoardo.bbs.dtos.CustomerDTO;
 import com.edoardo.bbs.entities.Customer;
+import com.edoardo.bbs.exceptions.ResourceNotFoundException;
 import com.edoardo.bbs.mapper.CustomerMapper;
 import com.edoardo.bbs.repositories.CustomerRepository;
 import com.edoardo.bbs.services.implementation.CustomerServiceImpl;
@@ -43,7 +44,7 @@ public class FindByIdTest {
     }
 
     @Test
-    public void findByIdReturnsNoneCustomer () {
+    public void findByIdReturnsNoneCustomer () throws ResourceNotFoundException {
         final Customer newCustomer = Customer.builder().taxCode(this.faker.code().isbn10())
                 .firstName(this.faker.name().firstName())
                 .lastName(this.faker.name().lastName())
@@ -60,7 +61,7 @@ public class FindByIdTest {
     }
 
     @Test
-    public void findByIdReturnsOneCustomer () {
+    public void findByIdReturnsOneCustomer () throws ResourceNotFoundException {
         final Customer newCustomer = Customer.builder().taxCode(this.faker.code().isbn10())
                 .firstName(this.faker.name().firstName())
                 .lastName(this.faker.name().lastName())
