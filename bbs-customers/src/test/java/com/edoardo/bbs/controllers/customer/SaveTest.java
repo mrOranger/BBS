@@ -3,6 +3,7 @@ package com.edoardo.bbs.controllers.customer;
 import com.edoardo.bbs.controllers.api.v1.CustomerController;
 import com.edoardo.bbs.dtos.AddressDTO;
 import com.edoardo.bbs.dtos.CustomerDTO;
+import com.edoardo.bbs.exceptions.ResourceConflictException;
 import com.edoardo.bbs.services.CustomerService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.javafaker.Faker;
@@ -74,14 +75,14 @@ public class SaveTest {
 
     @Test
     public void testSaveCustomerReturnsConflictException () throws Exception {
-        when(this.customerService.createCustomer(this.customer)).thenThrow(new ResourceConflictException("Customer already registered."));
+        when(this.customerService.createCustomer(this.customer)).thenThrow(new ResourceConflictException("Conflict."));
 
         ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/customers")
                 .content(this.mapper.writeValueAsString(this.customer))
                 .contentType(MediaType.APPLICATION_JSON));
 
         result.andExpect(MockMvcResultMatchers.status().isConflict())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Customer already registered.")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Conflict.")))
                 .andDo(MockMvcResultHandlers.print());
     }
 
