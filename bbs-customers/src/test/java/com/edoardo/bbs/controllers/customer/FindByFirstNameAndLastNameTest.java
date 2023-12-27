@@ -80,7 +80,7 @@ public class FindByFirstNameAndLastNameTest {
                 .contentType(MediaType.APPLICATION_JSON));
 
         result.andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content.size()", CoreMatchers.is(0)));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.size()", CoreMatchers.is(0)));
     }
 
     @Test
@@ -93,7 +93,7 @@ public class FindByFirstNameAndLastNameTest {
                 .contentType(MediaType.APPLICATION_JSON));
 
         result.andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content.size()", CoreMatchers.is(this.customers.size())));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.size()", CoreMatchers.is(this.customers.size())));
     }
 
 }
