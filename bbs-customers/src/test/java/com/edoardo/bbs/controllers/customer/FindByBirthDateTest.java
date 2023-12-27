@@ -1,6 +1,5 @@
 package com.edoardo.bbs.controllers.customer;
 
-
 import com.edoardo.bbs.controllers.api.v1.CustomerController;
 import com.edoardo.bbs.dtos.AddressDTO;
 import com.edoardo.bbs.dtos.CustomerDTO;
@@ -21,17 +20,14 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static org.mockito.Mockito.when;
 
+
 @WebMvcTest(controllers = CustomerController.class) @AutoConfigureMockMvc(addFilters = false)
 @ExtendWith(MockitoExtension.class)
-public class FindByFirstNameAndLastNameTest {
-
+public class FindByBirthDateTest {
     @Autowired
     private MockMvc mockMvc;
 
@@ -70,13 +66,12 @@ public class FindByFirstNameAndLastNameTest {
     }
 
     @Test
-    public void testGetAllCustomersByFirstNameAndLastNameReturnsEmptyResponse () throws Exception {
-        final String firstName = this.faker.name().firstName();
-        final String lastName = this.faker.name().lastName();
-        when(this.customerService.getCustomersByFirstNameAndLastName(firstName, lastName)).thenReturn(new ArrayList<>());
+    public void testGetAllCustomersByBirthDateReturnsEmptyResponse () throws Exception {
+        final Date birthDate = this.faker.date().birthday();
+        when(this.customerService.getCustomersByBirthDate(birthDate)).thenReturn(new ArrayList<>());
 
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/customers/firstName/{firstName}/lastName/{lastName}", firstName, lastName)
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/customers/birthDate/{birthDate}", birthDate)
                 .contentType(MediaType.APPLICATION_JSON));
 
         result.andExpect(MockMvcResultMatchers.status().isOk())
@@ -84,12 +79,11 @@ public class FindByFirstNameAndLastNameTest {
     }
 
     @Test
-    public void testGetAllCustomersByFirstNameAndLastNameReturnsManyCustomers () throws Exception {
-        final String firstName = this.faker.name().firstName();
-        final String lastName = this.faker.name().lastName();
-        when(this.customerService.getCustomersByFirstNameAndLastName(firstName, lastName)).thenReturn(this.customers);
+    public void testGetAllCustomersByBirthDateReturnsManyCustomers () throws Exception {
+        final Date birthDate = this.faker.date().birthday();
+        when(this.customerService.getCustomersByBirthDate(birthDate)).thenReturn(new ArrayList<>());
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/customers/firstName/{firstName}/lastName/{lastName}", firstName, lastName)
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/customers/birthDate/{birthDate}", birthDate)
                 .contentType(MediaType.APPLICATION_JSON));
 
         result.andExpect(MockMvcResultMatchers.status().isOk())
