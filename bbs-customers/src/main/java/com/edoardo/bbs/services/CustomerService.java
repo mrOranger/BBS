@@ -2,6 +2,7 @@ package com.edoardo.bbs.services;
 
 import com.edoardo.bbs.dtos.CustomerDTO;
 import com.edoardo.bbs.dtos.CustomerResponse;
+import com.edoardo.bbs.exceptions.ResourceConflictException;
 import com.edoardo.bbs.exceptions.ResourceNotFoundException;
 import org.springframework.data.domain.Pageable;
 
@@ -15,7 +16,7 @@ public interface CustomerService {
 
     CustomerDTO getCustomerByTaxCode (String taxCode) throws ResourceNotFoundException;
 
-    CustomerDTO createCustomer (CustomerDTO customer);
-    CustomerDTO updateCustomer (CustomerDTO customer);
+    CustomerDTO createCustomer (CustomerDTO customer) throws ResourceConflictException;
+    CustomerDTO updateCustomer (CustomerDTO customer) throws ResourceNotFoundException;
     CustomerDTO deleteCustomer (CustomerDTO customer);
 }

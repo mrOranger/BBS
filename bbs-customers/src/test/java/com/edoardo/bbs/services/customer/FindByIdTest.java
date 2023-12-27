@@ -23,6 +23,7 @@ import java.util.HashSet;
 import java.util.Optional;
 import java.util.Set;
 
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -44,7 +45,7 @@ public class FindByIdTest {
     }
 
     @Test
-    public void findByIdReturnsNoneCustomer () throws ResourceNotFoundException {
+    public void findByIdThrowsResourceNotFoundException () throws ResourceNotFoundException {
         final Customer newCustomer = Customer.builder().taxCode(this.faker.code().isbn10())
                 .firstName(this.faker.name().firstName())
                 .lastName(this.faker.name().lastName())
@@ -55,9 +56,7 @@ public class FindByIdTest {
                 .idCard(this.faker.file().toString())
                 .build();
 
-        final CustomerDTO customer = this.customerService.getCustomerByTaxCode(newCustomer.getTaxCode());
-
-        Assertions.assertThat(customer).isNull();
+        assertThrows(ResourceNotFoundException.class, () -> this.customerService.getCustomerByTaxCode(newCustomer.getTaxCode()));
     }
 
     @Test

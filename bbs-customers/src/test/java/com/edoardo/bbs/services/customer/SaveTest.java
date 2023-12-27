@@ -4,6 +4,7 @@ import com.edoardo.bbs.dtos.AddressDTO;
 import com.edoardo.bbs.dtos.CustomerDTO;
 import com.edoardo.bbs.entities.Address;
 import com.edoardo.bbs.entities.Customer;
+import com.edoardo.bbs.exceptions.ResourceConflictException;
 import com.edoardo.bbs.mapper.CustomerMapper;
 import com.edoardo.bbs.repositories.CustomerRepository;
 import com.edoardo.bbs.services.implementation.CustomerServiceImpl;
@@ -42,7 +43,7 @@ public class SaveTest {
     }
 
     @Test
-    public void saveCustomerWithoutAddress () {
+    public void saveCustomerWithoutAddress () throws ResourceConflictException {
         final Customer newCustomer = Customer.builder().taxCode(this.faker.code().isbn10())
                 .firstName(this.faker.name().firstName())
                 .lastName(this.faker.name().lastName())
@@ -71,7 +72,7 @@ public class SaveTest {
     }
 
     @Test
-    public void saveCustomerWithAddress () {
+    public void saveCustomerWithAddress () throws ResourceConflictException {
         final Address address = Address.builder().country(this.faker.address().country())
                 .state(this.faker.address().state())
                 .city(this.faker.address().city())

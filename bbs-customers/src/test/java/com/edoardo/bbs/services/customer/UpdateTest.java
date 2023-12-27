@@ -4,6 +4,7 @@ import com.edoardo.bbs.dtos.AddressDTO;
 import com.edoardo.bbs.dtos.CustomerDTO;
 import com.edoardo.bbs.entities.Address;
 import com.edoardo.bbs.entities.Customer;
+import com.edoardo.bbs.exceptions.ResourceNotFoundException;
 import com.edoardo.bbs.mapper.CustomerMapper;
 import com.edoardo.bbs.repositories.CustomerRepository;
 import com.edoardo.bbs.services.implementation.CustomerServiceImpl;
@@ -22,6 +23,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -43,7 +45,7 @@ public class UpdateTest {
     }
 
     @Test
-    public void updateCustomerWithoutAddress () {
+    public void updateCustomerWithoutAddressThrowsException () throws ResourceNotFoundException {
         final Customer customer = Customer.builder().taxCode(this.faker.code().isbn10())
                 .firstName(this.faker.name().firstName())
                 .lastName(this.faker.name().lastName())
@@ -55,13 +57,12 @@ public class UpdateTest {
                 .addresses(new HashSet<>())
                 .build();
         when(this.customerRepository.findById(customer.getTaxCode())).thenReturn(Optional.empty());
-        final CustomerDTO updatedCustomer = this.customerService.updateCustomer(this.mapToDto(customer));
 
-        assertThat(updatedCustomer).isNull();
+        assertThrows(ResourceNotFoundException.class, () -> this.customerService.updateCustomer(this.mapToDto(customer)));
     }
 
     @Test
-    public void updateCustomerWithAddress () {
+    public void updateCustomerWithoutAddressReturnsCustomer () throws ResourceNotFoundException {
         final Customer customer = Customer.builder().taxCode(this.faker.code().isbn10())
                 .firstName(this.faker.name().firstName())
                 .lastName(this.faker.name().lastName())
@@ -91,7 +92,7 @@ public class UpdateTest {
     }
 
     @Test
-    public void CustomerRepository_update_withAddress_returnsCustomer () {
+    public void updateCustomerWithAddressReturnsCustomer () throws ResourceNotFoundException {
         final Address address = Address.builder().country(this.faker.address().country())
                 .state(this.faker.address().state())
                 .city(this.faker.address().city())

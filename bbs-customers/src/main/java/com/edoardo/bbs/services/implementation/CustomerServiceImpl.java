@@ -4,11 +4,11 @@ import com.edoardo.bbs.dtos.CustomerDTO;
 import com.edoardo.bbs.dtos.CustomerResponse;
 import com.edoardo.bbs.entities.Address;
 import com.edoardo.bbs.entities.Customer;
+import com.edoardo.bbs.exceptions.ResourceConflictException;
 import com.edoardo.bbs.exceptions.ResourceNotFoundException;
 import com.edoardo.bbs.mapper.CustomerMapper;
 import com.edoardo.bbs.repositories.CustomerRepository;
 import com.edoardo.bbs.services.CustomerService;
-import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -69,41 +69,69 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public CustomerDTO createCustomer(CustomerDTO customer) {
-        final Set<Address> addresses = new HashSet<>();
-        customer.getAddresses().forEach((entity) -> {
-            final Address address = Address.builder()
-                    .country(entity.getCountry())
-                    .state(entity.getState())
-                    .city(entity.getCity())
-                    .street(entity.getStreet())
-                    .streetNumber(entity.getStreetNumber())
-                    .postalCode(entity.getPostalCode())
+    public CustomerDTO createCustomer(CustomerDTO customer) throws ResourceConflictException {
+        final Optional<Customer> existingCustomer = this.customerRepository.findById(customer.getTaxCode());
+        if (existingCustomer.isEmpty()) {
+            final Set<Address> addresses = new HashSet<>();
+            customer.getAddresses().forEach((entity) -> {
+                final Address address = Address.builder()
+                        .country(entity.getCountry())
+                        .state(entity.getState())
+                        .city(entity.getCity())
+                        .street(entity.getStreet())
+                        .streetNumber(entity.getStreetNumber())
+                        .postalCode(entity.getPostalCode())
+                        .build();
+                addresses.add(address);
+            });
+            final Customer customerEntity = Customer.builder()
+                    .taxCode(customer.getTaxCode())
+                    .firstName(customer.getFirstName())
+                    .lastName(customer.getLastName())
+                    .birthDate(customer.getBirthDate())
+                    .email(customer.getEmail())
+                    .emailVerifiedAt(customer.getEmailVerifiedAt())
+                    .password(customer.getPassword())
+                    .idCard(customer.getIdCard())
+                    .addresses(addresses)
                     .build();
-            addresses.add(address);
-        });
-        final Customer customerEntity = Customer.builder()
-                .taxCode(customer.getTaxCode())
-                .firstName(customer.getFirstName())
-                .lastName(customer.getLastName())
-                .birthDate(customer.getBirthDate())
-                .email(customer.getEmail())
-                .emailVerifiedAt(customer.getEmailVerifiedAt())
-                .password(customer.getPassword())
-                .idCard(customer.getIdCard())
-                .addresses(addresses)
-                .build();
 
-        return this.customerModelMapper.convertToDTO(this.customerRepository.save(customerEntity));
+            return this.customerModelMapper.convertToDTO(this.customerRepository.save(customerEntity));
+        }
+        throw new ResourceConflictException("Conflict.");
     }
 
     @Override
-    public CustomerDTO updateCustomer(CustomerDTO customer) {
+    public CustomerDTO updateCustomer(CustomerDTO customer) throws ResourceNotFoundException {
         final Optional<Customer> existingCustomer = this.customerRepository.findById(customer.getTaxCode());
         if (existingCustomer.isPresent()) {
-            return this.createCustomer(customer);
+            final Set<Address> addresses = new HashSet<>();
+            customer.getAddresses().forEach((entity) -> {
+                final Address address = Address.builder()
+                        .country(entity.getCountry())
+                        .state(entity.getState())
+                        .city(entity.getCity())
+                        .street(entity.getStreet())
+                        .streetNumber(entity.getStreetNumber())
+                        .postalCode(entity.getPostalCode())
+                        .build();
+                addresses.add(address);
+            });
+            final Customer customerEntity = Customer.builder()
+                    .taxCode(customer.getTaxCode())
+                    .firstName(customer.getFirstName())
+                    .lastName(customer.getLastName())
+                    .birthDate(customer.getBirthDate())
+                    .email(customer.getEmail())
+                    .emailVerifiedAt(customer.getEmailVerifiedAt())
+                    .password(customer.getPassword())
+                    .idCard(customer.getIdCard())
+                    .addresses(addresses)
+                    .build();
+
+            return this.customerModelMapper.convertToDTO(this.customerRepository.save(customerEntity));
         }
-        return null;
+        throw new ResourceNotFoundException ("Not found.");
     }
 
     @Override
