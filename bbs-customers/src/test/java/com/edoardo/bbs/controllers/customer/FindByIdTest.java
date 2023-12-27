@@ -3,6 +3,7 @@ package com.edoardo.bbs.controllers.customer;
 import com.edoardo.bbs.controllers.api.v1.CustomerController;
 import com.edoardo.bbs.dtos.AddressDTO;
 import com.edoardo.bbs.dtos.CustomerDTO;
+import com.edoardo.bbs.exceptions.ResourceNotFoundException;
 import com.edoardo.bbs.services.CustomerService;
 import com.github.javafaker.Faker;
 import org.hamcrest.CoreMatchers;
