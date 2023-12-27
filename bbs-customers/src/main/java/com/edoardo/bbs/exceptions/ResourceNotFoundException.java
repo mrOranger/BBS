@@ -1,5 +1,9 @@
 package com.edoardo.bbs.exceptions;
 
+import lombok.Getter;
+import lombok.Setter;
+
+@Getter @Setter
 public class ResourceNotFoundException extends Exception{
 
     private String message;
