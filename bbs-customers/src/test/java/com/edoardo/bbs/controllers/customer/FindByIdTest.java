@@ -31,18 +31,21 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class FindByIdTest {
 
-    @Autowired
-    private MockMvc mockMvc;
+    private final MockMvc mockMvc;
 
     @MockBean
     private CustomerService customerService;
 
     private CustomerDTO customer;
-    private Faker faker;
+
+    @Autowired
+    public FindByIdTest (MockMvc mockMvc) {
+        this.mockMvc = mockMvc;
+    }
 
     @BeforeEach
     public void init () {
-        this.faker = new Faker();
+        Faker faker = new Faker();
         Set<AddressDTO> addresses = new HashSet<>();
         final AddressDTO newAddress = AddressDTO.builder().country(faker.address().country())
                 .state(faker.address().state())
@@ -56,8 +59,8 @@ public class FindByIdTest {
                 .firstName(faker.name().firstName())
                 .lastName(faker.name().lastName())
                 .email(faker.internet().emailAddress())
-                .birthDate(this.faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
-                .emailVerifiedAt(this.faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
+                .birthDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
+                .emailVerifiedAt(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
                 .password(faker.internet().password())
                 .idCard(faker.file().toString())
                 .addresses(addresses)
