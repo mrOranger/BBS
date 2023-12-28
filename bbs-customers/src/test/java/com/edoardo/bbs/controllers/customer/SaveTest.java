@@ -4,6 +4,7 @@ import com.edoardo.bbs.controllers.api.v1.CustomerController;
 import com.edoardo.bbs.dtos.AddressDTO;
 import com.edoardo.bbs.dtos.CustomerDTO;
 import com.edoardo.bbs.exceptions.ResourceConflictException;
+import com.edoardo.bbs.exceptions.ValidationException;
 import com.edoardo.bbs.services.CustomerService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.javafaker.Faker;
@@ -83,6 +84,19 @@ public class SaveTest {
 
         result.andExpect(MockMvcResultMatchers.status().isConflict())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Conflict.")))
+                .andDo(MockMvcResultHandlers.print());
+    }
+
+    @Test
+    public void testSaveCustomerReturnsValidationException () throws Exception {
+        when(this.customerService.createCustomer(this.customer)).thenThrow(new ValidationException("Invalid first name."));
+
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/customers")
+                .content(this.mapper.writeValueAsString(this.customer))
+                .contentType(MediaType.APPLICATION_JSON));
+
+        result.andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Invalid first name.")))
                 .andDo(MockMvcResultHandlers.print());
     }
 
