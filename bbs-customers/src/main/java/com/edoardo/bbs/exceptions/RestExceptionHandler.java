@@ -19,4 +19,9 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
     public final ResponseEntity<ErrorResponse> resourceConflictExceptionHandler (ResourceConflictException exception) {
         return new ResponseEntity<>(new ErrorResponse(exception.getMessage()), new HttpHeaders(), HttpStatus.CONFLICT);
     }
+
+    @ExceptionHandler(ValidationException.class)
+    public final ResponseEntity<ErrorResponse> validationExceptionHandler (ValidationException exception) {
+        return new ResponseEntity<>(new ErrorResponse(exception.getMessage()), new HttpHeaders(), HttpStatus.BAD_REQUEST);
+    }
 }
