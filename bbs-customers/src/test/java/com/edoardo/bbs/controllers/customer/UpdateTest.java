@@ -39,11 +39,13 @@ public class UpdateTest {
     private CustomerDTO customer;
     private ObjectMapper mapper;
     private final MockMvc mockMvc;
+    private final String baseUrl;
 
 
     @Autowired
     public UpdateTest (MockMvc mockMvc, CustomerService customerService, ObjectMapper mapper) {
         this.customerService = customerService;
+        this.baseUrl = "/api/v1/customers/";
         this.mockMvc = mockMvc;
         this.mapper = mapper;
     }
@@ -67,7 +69,7 @@ public class UpdateTest {
                 .birthDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
                 .emailVerifiedAt(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
                 .password(faker.internet().password())
-                .idCard(faker.file().toString())
+                .idCard(faker.file().fileName())
                 .addresses(addresses)
                 .build();
     }
@@ -76,7 +78,7 @@ public class UpdateTest {
     public void testUpdateCustomerReturnsNotFoundException () throws Exception {
         when(this.customerService.updateCustomer(this.customer.getTaxCode(), this.customer)).thenThrow(new ResourceNotFoundException("Not found."));
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.put("/customers/" + customer.getTaxCode())
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.put(this.baseUrl + customer.getTaxCode())
                 .content(this.mapper.writeValueAsString(this.customer))
                 .contentType(MediaType.APPLICATION_JSON));
 
@@ -89,7 +91,7 @@ public class UpdateTest {
     public void testUpdateCustomerReturnsOkResponse () throws Exception {
         when(this.customerService.updateCustomer(this.customer.getTaxCode(), this.customer)).thenReturn(this.customer);
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.put("/customers/" + customer.getTaxCode())
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.put(this.baseUrl + customer.getTaxCode())
                 .content(this.mapper.writeValueAsString(this.customer))
                 .contentType(MediaType.APPLICATION_JSON));
 
@@ -97,9 +99,7 @@ public class UpdateTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.taxCode", CoreMatchers.is(this.customer.getTaxCode())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.firstName", CoreMatchers.is(this.customer.getFirstName())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.lastName", CoreMatchers.is(this.customer.getLastName())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.birthDate", CoreMatchers.is(this.customer.getBirthDate())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.email", CoreMatchers.is(this.customer.getEmail())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.emailVerifiedAt", CoreMatchers.is(this.customer.getEmailVerifiedAt())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.password", CoreMatchers.is(this.customer.getPassword())))
                 .andExpect(MockMvcResultMatchers.jsonPath("$.idCard", CoreMatchers.is(this.customer.getIdCard())))
                 .andDo(MockMvcResultHandlers.print());

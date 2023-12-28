@@ -55,4 +55,12 @@ public class CustomerController {
         final URI customerURI = uriBuilder.path("/customers/{id}").buildAndExpand(savedCustomer.getTaxCode()).toUri();
         return ResponseEntity.created(customerURI).build();
     }
+
+    @PutMapping(value = "/customers/{taxCode}") @SneakyThrows
+    public ResponseEntity<CustomerDTO> putCustomer (
+            @PathVariable String taxCode,
+            @RequestBody CustomerDTO updatedCustomer
+    ) {
+        return ResponseEntity.ok(this.customerService.updateCustomer(taxCode, updatedCustomer));
+    }
 }
