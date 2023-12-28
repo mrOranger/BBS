@@ -3,12 +3,12 @@ package com.edoardo.bbs.exceptions;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
 @ControllerAdvice
-public class RestExceptionHandler extends ResponseEntityExceptionHandler {
+public class RestExceptionHandler {
 
     @ExceptionHandler(ResourceNotFoundException.class)
     public final ResponseEntity<ErrorResponse> resourceNotFoundExceptionHandler (ResourceNotFoundException exception) {
@@ -20,8 +20,8 @@ public class RestExceptionHandler extends ResponseEntityExceptionHandler {
         return new ResponseEntity<>(new ErrorResponse(exception.getMessage()), new HttpHeaders(), HttpStatus.CONFLICT);
     }
 
-    @ExceptionHandler(ValidationException.class)
-    public final ResponseEntity<ErrorResponse> validationExceptionHandler (ValidationException exception) {
-        return new ResponseEntity<>(new ErrorResponse(exception.getMessage()), new HttpHeaders(), HttpStatus.BAD_REQUEST);
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    protected ResponseEntity<Object> handleHandlerMethodValidationException(MethodArgumentNotValidException exception) {
+        return new ResponseEntity<>(new ErrorResponse(exception.getBindingResult().getFieldErrors().get(0).getDefaultMessage()), HttpStatus.BAD_REQUEST);
     }
 }

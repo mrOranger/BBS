@@ -3,11 +3,14 @@ package com.edoardo.bbs.controllers.api.v1;
 import com.edoardo.bbs.dtos.CustomerDTO;
 import com.edoardo.bbs.dtos.CustomerResponse;
 import com.edoardo.bbs.services.CustomerService;
+import jakarta.validation.Valid;
+import jakarta.validation.ValidationException;
 import lombok.SneakyThrows;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -49,19 +52,25 @@ public class CustomerController {
         return ResponseEntity.ok(this.customerService.getCustomerByTaxCode(taxCode));
     }
 
-    @PostMapping(value = "/customers") @SneakyThrows
-    public ResponseEntity<Void> postCustomer (@RequestBody CustomerDTO customer, UriComponentsBuilder uriBuilder) {
+    @PostMapping(value = "/customers", produces = "application/json") @SneakyThrows
+    public ResponseEntity<Void> postCustomer (
+            @Valid  @RequestBody CustomerDTO customer, UriComponentsBuilder uriBuilder
+    ) {
         final CustomerDTO savedCustomer = this.customerService.createCustomer(customer);
         final URI customerURI = uriBuilder.path("/customers/{id}").buildAndExpand(savedCustomer.getTaxCode()).toUri();
         return ResponseEntity.created(customerURI).build();
     }
 
-    @PutMapping(value = "/customers/{taxCode}") @SneakyThrows
+    @PutMapping(value = "/customers/{taxCode}", produces = "application/json") @SneakyThrows
     public ResponseEntity<CustomerDTO> putCustomer (
             @PathVariable String taxCode,
-            @RequestBody CustomerDTO updatedCustomer
+            @Valid @RequestBody CustomerDTO updatedCustomer,
+            Errors validationErrors
     ) {
-        return ResponseEntity.ok(this.customerService.updateCustomer(taxCode, updatedCustomer));
+        if (!validationErrors.hasErrors()) {
+            return ResponseEntity.ok(this.customerService.updateCustomer(taxCode, updatedCustomer));
+        }
+        throw new ValidationException(validationErrors.getFieldError().getDefaultMessage());
     }
 
     @DeleteMapping(value = "/customers/{taxCode}") @SneakyThrows
