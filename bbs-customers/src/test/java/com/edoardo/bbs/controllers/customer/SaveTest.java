@@ -87,15 +87,15 @@ public class SaveTest {
     }
 
     @Test
-    public void testSaveCustomerReturnsOkayResponse () throws Exception {
+    public void testSaveCustomerReturnsCreatedResponse () throws Exception {
         when(this.customerService.createCustomer(this.customer)).thenReturn(this.customer);
 
         ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/customers")
                 .content(this.mapper.writeValueAsString(this.customer))
                 .contentType(MediaType.APPLICATION_JSON));
 
-        result.andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Customer created successfully.")))
+        result.andExpect(MockMvcResultMatchers.status().isCreated())
+                .andExpect(MockMvcResultMatchers.header().exists("Location"))
                 .andDo(MockMvcResultHandlers.print());
     }
 }

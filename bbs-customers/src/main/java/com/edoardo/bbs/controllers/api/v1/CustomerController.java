@@ -2,7 +2,6 @@ package com.edoardo.bbs.controllers.api.v1;
 
 import com.edoardo.bbs.dtos.CustomerDTO;
 import com.edoardo.bbs.dtos.CustomerResponse;
-import com.edoardo.bbs.exceptions.ResourceNotFoundException;
 import com.edoardo.bbs.services.CustomerService;
 import lombok.SneakyThrows;
 import lombok.extern.java.Log;
@@ -10,7 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.util.UriComponentsBuilder;
 
+import java.net.URI;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -46,5 +47,12 @@ public class CustomerController {
     @GetMapping(value = "/customers/{taxCode}") @SneakyThrows
     public ResponseEntity<CustomerDTO> getCustomerByTaxCode (@PathVariable String taxCode) {
         return ResponseEntity.ok(this.customerService.getCustomerByTaxCode(taxCode));
+    }
+
+    @PostMapping(value = "/customers") @SneakyThrows
+    public ResponseEntity<Void> postCustomer (@RequestBody CustomerDTO customer, UriComponentsBuilder uriBuilder) {
+        final CustomerDTO savedCustomer = this.customerService.createCustomer(customer);
+        final URI customerURI = uriBuilder.path("/customers/{id}").buildAndExpand(savedCustomer.getTaxCode()).toUri();
+        return ResponseEntity.created(customerURI).build();
     }
 }
