@@ -4,7 +4,6 @@ import com.edoardo.bbs.controllers.api.v1.CustomerController;
 import com.edoardo.bbs.dtos.AddressDTO;
 import com.edoardo.bbs.dtos.CustomerDTO;
 import com.edoardo.bbs.exceptions.ResourceConflictException;
-import com.edoardo.bbs.exceptions.ValidationException;
 import com.edoardo.bbs.services.CustomerService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.javafaker.Faker;
@@ -34,42 +33,42 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class SaveTest {
 
-    private final MockMvc mockMvc;
-
     @MockBean
     private CustomerService customerService;
 
-    private CustomerDTO customer;
 
+    private final MockMvc mockMvc;
+    private CustomerDTO customer;
     private ObjectMapper mapper;
+    private Faker faker;
 
     @Autowired
     public SaveTest (MockMvc mockMvc, CustomerService customerService, ObjectMapper mapper) {
+        this.mapper = mapper;
         this.mockMvc = mockMvc;
         this.customerService = customerService;
-        this.mapper = mapper;
+        this.faker = new Faker();
     }
 
     @BeforeEach
     public void init () {
-        Faker faker = new Faker();
         Set<AddressDTO> addresses = new HashSet<>();
-        final AddressDTO newAddress = AddressDTO.builder().country(faker.address().country())
-                .state(faker.address().state())
-                .city(faker.address().city())
-                .street(faker.address().streetName())
-                .streetNumber(Integer.parseInt(faker.address().streetAddressNumber()))
-                .postalCode(faker.address().zipCode())
+        final AddressDTO newAddress = AddressDTO.builder().country(this.faker.address().country())
+                .state(this.faker.address().state())
+                .city(this.faker.address().city())
+                .street(this.faker.address().streetName())
+                .streetNumber(Integer.parseInt(this.faker.address().streetAddressNumber()))
+                .postalCode(this.faker.address().zipCode())
                 .build();
         addresses.add(newAddress);
-        this.customer = CustomerDTO.builder().taxCode(faker.code().isbn10())
-                .firstName(faker.name().firstName())
-                .lastName(faker.name().lastName())
-                .email(faker.internet().emailAddress())
-                .birthDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
-                .emailVerifiedAt(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
-                .password(faker.internet().password())
-                .idCard(faker.file().toString())
+        this.customer = CustomerDTO.builder().taxCode(this.faker.code().isbn10())
+                .firstName(this.faker.name().firstName())
+                .lastName(this.faker.name().lastName())
+                .email(this.faker.internet().emailAddress())
+                .birthDate(this.faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
+                .emailVerifiedAt(this.faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
+                .password(this.faker.internet().password())
+                .idCard(this.faker.file().toString())
                 .addresses(addresses)
                 .build();
     }
@@ -88,15 +87,22 @@ public class SaveTest {
     }
 
     @Test
-    public void testSaveCustomerReturnsValidationException () throws Exception {
-        when(this.customerService.createCustomer(this.customer)).thenThrow(new ValidationException("Invalid first name."));
+    public void testSaveCustomerWithoutFirstNameReturnsValidationException () throws Exception {
+        this.customer = CustomerDTO.builder().taxCode(faker.code().isbn10())
+                .lastName(faker.name().lastName())
+                .email(faker.internet().emailAddress())
+                .birthDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
+                .emailVerifiedAt(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
+                .password(faker.internet().password())
+                .idCard(faker.file().toString())
+                .build();
 
         ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/customers")
                 .content(this.mapper.writeValueAsString(this.customer))
                 .contentType(MediaType.APPLICATION_JSON));
 
         result.andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Invalid first name.")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Customer first name must not be empty.")))
                 .andDo(MockMvcResultHandlers.print());
     }
 

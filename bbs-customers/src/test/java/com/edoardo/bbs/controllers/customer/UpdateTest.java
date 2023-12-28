@@ -88,19 +88,6 @@ public class UpdateTest {
     }
 
     @Test
-    public void testSaveCustomerReturnsValidationException () throws Exception {
-        when(this.customerService.updateCustomer(this.customer.getTaxCode(), this.customer)).thenThrow(new ValidationException("Invalid first name."));
-
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.put(this.baseUrl + customer.getTaxCode())
-                .content(this.mapper.writeValueAsString(this.customer))
-                .contentType(MediaType.APPLICATION_JSON));
-
-        result.andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Invalid first name.")))
-                .andDo(MockMvcResultHandlers.print());
-    }
-
-    @Test
     public void testUpdateCustomerReturnsOkResponse () throws Exception {
         when(this.customerService.updateCustomer(this.customer.getTaxCode(), this.customer)).thenReturn(this.customer);
 
