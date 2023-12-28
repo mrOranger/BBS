@@ -58,7 +58,7 @@ public class UpdateTest {
                 .build();
         when(this.customerRepository.findById(customer.getTaxCode())).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> this.customerService.updateCustomer(this.mapToDto(customer)));
+        assertThrows(ResourceNotFoundException.class, () -> this.customerService.updateCustomer(customer.getTaxCode(), this.mapToDto(customer)));
     }
 
     @Test
@@ -77,7 +77,7 @@ public class UpdateTest {
         when(this.customerMapper.convertToDTO(customer)).thenReturn(this.mapToDto(customer));
         when(this.customerRepository.findById(customer.getTaxCode())).thenReturn(Optional.of(customer));
         when(this.customerRepository.save(Mockito.any(Customer.class))).thenReturn(customer);
-        final CustomerDTO updatedCustomer = this.customerService.updateCustomer(this.mapToDto(customer));
+        final CustomerDTO updatedCustomer = this.customerService.updateCustomer(customer.getTaxCode(), this.mapToDto(customer));
 
         assertThat(updatedCustomer).isNotNull();
         assertThat(updatedCustomer.getTaxCode()).isEqualTo(customer.getTaxCode());
@@ -114,7 +114,7 @@ public class UpdateTest {
         when(this.customerMapper.convertToDTO(customer)).thenReturn(this.mapToDto(customer));
         when(this.customerRepository.findById(customer.getTaxCode())).thenReturn(Optional.of(customer));
         when(this.customerRepository.save(Mockito.any(Customer.class))).thenReturn(customer);
-        final CustomerDTO updatedCustomer = this.customerService.updateCustomer(this.mapToDto(customer));
+        final CustomerDTO updatedCustomer = this.customerService.updateCustomer(customer.getTaxCode(), this.mapToDto(customer));
 
         assertThat(updatedCustomer).isNotNull();
         assertThat(updatedCustomer.getTaxCode()).isEqualTo(customer.getTaxCode());

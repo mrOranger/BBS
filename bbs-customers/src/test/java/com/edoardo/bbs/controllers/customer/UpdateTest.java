@@ -22,7 +22,6 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.net.URI;
 import java.time.ZoneId;
@@ -39,13 +38,11 @@ public class UpdateTest {
 
     private CustomerDTO customer;
     private ObjectMapper mapper;
-
     private final MockMvc mockMvc;
-    private final UriComponentsBuilder componentsBuilder;
+
 
     @Autowired
-    public UpdateTest (MockMvc mockMvc, CustomerService customerService, ObjectMapper mapper, UriComponentsBuilder componentsBuilder) {
-        this.componentsBuilder = componentsBuilder;
+    public UpdateTest (MockMvc mockMvc, CustomerService customerService, ObjectMapper mapper) {
         this.customerService = customerService;
         this.mockMvc = mockMvc;
         this.mapper = mapper;
@@ -77,10 +74,9 @@ public class UpdateTest {
 
     @Test
     public void testUpdateCustomerReturnsNotFoundException () throws Exception {
-        when(this.customerService.updateCustomer(this.customer)).thenThrow(new ResourceNotFoundException("Not found."));
-        final URI customerURI = this.componentsBuilder.path("/customers/{id}").buildAndExpand(customer.getTaxCode()).toUri();
+        when(this.customerService.updateCustomer(this.customer.getTaxCode(), this.customer)).thenThrow(new ResourceNotFoundException("Not found."));
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.put(customerURI)
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.put("/customers/" + customer.getTaxCode())
                 .content(this.mapper.writeValueAsString(this.customer))
                 .contentType(MediaType.APPLICATION_JSON));
 
@@ -91,10 +87,9 @@ public class UpdateTest {
 
     @Test
     public void testUpdateCustomerReturnsOkResponse () throws Exception {
-        when(this.customerService.updateCustomer(this.customer)).thenReturn(this.customer);
-        final URI customerURI = this.componentsBuilder.path("/customers/{id}").buildAndExpand(customer.getTaxCode()).toUri();
+        when(this.customerService.updateCustomer(this.customer.getTaxCode(), this.customer)).thenReturn(this.customer);
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.put(customerURI)
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.put("/customers/" + customer.getTaxCode())
                 .content(this.mapper.writeValueAsString(this.customer))
                 .contentType(MediaType.APPLICATION_JSON));
 

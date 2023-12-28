@@ -102,8 +102,8 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public CustomerDTO updateCustomer(CustomerDTO customer) throws ResourceNotFoundException {
-        final Optional<Customer> existingCustomer = this.customerRepository.findById(customer.getTaxCode());
+    public CustomerDTO updateCustomer(String taxCode, CustomerDTO customer) throws ResourceNotFoundException {
+        final Optional<Customer> existingCustomer = this.customerRepository.findById(taxCode);
         if (existingCustomer.isPresent()) {
             final Set<Address> addresses = new HashSet<>();
             customer.getAddresses().forEach((entity) -> {

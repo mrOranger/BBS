@@ -17,6 +17,6 @@ public interface CustomerService {
     CustomerDTO getCustomerByTaxCode (String taxCode) throws ResourceNotFoundException;
 
     CustomerDTO createCustomer (CustomerDTO customer) throws ResourceConflictException;
-    CustomerDTO updateCustomer (CustomerDTO customer) throws ResourceNotFoundException;
+    CustomerDTO updateCustomer (String taxCode, CustomerDTO customer) throws ResourceNotFoundException;
     CustomerDTO deleteCustomer (CustomerDTO customer);
 }
