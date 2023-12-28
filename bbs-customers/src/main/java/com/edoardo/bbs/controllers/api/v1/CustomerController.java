@@ -63,4 +63,9 @@ public class CustomerController {
     ) {
         return ResponseEntity.ok(this.customerService.updateCustomer(taxCode, updatedCustomer));
     }
+
+    @DeleteMapping(value = "/customers/{taxCode}") @SneakyThrows
+    public ResponseEntity<CustomerDTO> deleteCustomer ( @PathVariable String taxCode ) {
+        return ResponseEntity.ok(this.customerService.deleteCustomer(taxCode));
+    }
 }

@@ -135,9 +135,12 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public CustomerDTO deleteCustomer(CustomerDTO customer) {
-        final Optional<Customer> existingCustomer = this.customerRepository.findById(customer.getTaxCode());
-        existingCustomer.ifPresent(this.customerRepository::delete);
-        return null;
+    public CustomerDTO deleteCustomer(String taxCode) throws ResourceNotFoundException {
+        final Optional<Customer> existingCustomer = this.customerRepository.findById(taxCode);
+        if (!existingCustomer.isPresent()) {
+            throw new ResourceNotFoundException();
+        }
+        this.customerRepository.delete(existingCustomer.get());
+        return this.customerModelMapper.convertToDTO(existingCustomer.get());
     }
 }

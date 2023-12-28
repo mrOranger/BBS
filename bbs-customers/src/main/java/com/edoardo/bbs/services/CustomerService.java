@@ -18,5 +18,5 @@ public interface CustomerService {
 
     CustomerDTO createCustomer (CustomerDTO customer) throws ResourceConflictException;
     CustomerDTO updateCustomer (String taxCode, CustomerDTO customer) throws ResourceNotFoundException;
-    CustomerDTO deleteCustomer (CustomerDTO customer);
+    CustomerDTO deleteCustomer (String taxCode) throws ResourceNotFoundException;
 }

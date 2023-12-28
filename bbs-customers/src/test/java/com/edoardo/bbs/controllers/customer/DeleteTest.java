@@ -31,7 +31,7 @@ import static org.mockito.Mockito.when;
 
 @WebMvcTest(controllers = CustomerController.class) @AutoConfigureMockMvc(addFilters = false)
 @ExtendWith(MockitoExtension.class)
-public class UpdateTest {
+public class DeleteTest {
     @MockBean
     private CustomerService customerService;
 
@@ -42,7 +42,7 @@ public class UpdateTest {
 
 
     @Autowired
-    public UpdateTest (MockMvc mockMvc, CustomerService customerService, ObjectMapper mapper) {
+    public DeleteTest (MockMvc mockMvc, CustomerService customerService, ObjectMapper mapper) {
         this.customerService = customerService;
         this.baseUrl = "/api/v1/customers/";
         this.mockMvc = mockMvc;
@@ -74,10 +74,10 @@ public class UpdateTest {
     }
 
     @Test
-    public void testUpdateCustomerReturnsNotFoundException () throws Exception {
-        when(this.customerService.updateCustomer(this.customer.getTaxCode(), this.customer)).thenThrow(new ResourceNotFoundException("Not found."));
+    public void testDeleteCustomerReturnsNotFoundException () throws Exception {
+        when(this.customerService.deleteCustomer(this.customer.getTaxCode())).thenThrow(new ResourceNotFoundException("Not found."));
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.put(this.baseUrl + customer.getTaxCode())
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.delete(this.baseUrl + customer.getTaxCode())
                 .content(this.mapper.writeValueAsString(this.customer))
                 .contentType(MediaType.APPLICATION_JSON));
 
@@ -87,20 +87,14 @@ public class UpdateTest {
     }
 
     @Test
-    public void testUpdateCustomerReturnsOkResponse () throws Exception {
-        when(this.customerService.updateCustomer(this.customer.getTaxCode(), this.customer)).thenReturn(this.customer);
+    public void testDeleteCustomerReturnsOkResponse () throws Exception {
+        when(this.customerService.deleteCustomer(this.customer.getTaxCode())).thenReturn(this.customer);
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.put(this.baseUrl + customer.getTaxCode())
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.delete(this.baseUrl + customer.getTaxCode())
                 .content(this.mapper.writeValueAsString(this.customer))
                 .contentType(MediaType.APPLICATION_JSON));
 
         result.andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.taxCode", CoreMatchers.is(this.customer.getTaxCode())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.firstName", CoreMatchers.is(this.customer.getFirstName())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.lastName", CoreMatchers.is(this.customer.getLastName())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.email", CoreMatchers.is(this.customer.getEmail())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.password", CoreMatchers.is(this.customer.getPassword())))
-                .andExpect(MockMvcResultMatchers.jsonPath("$.idCard", CoreMatchers.is(this.customer.getIdCard())))
                 .andDo(MockMvcResultHandlers.print());
     }
 }
