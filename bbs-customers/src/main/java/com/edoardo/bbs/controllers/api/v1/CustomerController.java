@@ -4,13 +4,11 @@ import com.edoardo.bbs.dtos.CustomerDTO;
 import com.edoardo.bbs.dtos.CustomerResponse;
 import com.edoardo.bbs.services.CustomerService;
 import jakarta.validation.Valid;
-import jakarta.validation.ValidationException;
 import lombok.SneakyThrows;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.Errors;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriComponentsBuilder;
 

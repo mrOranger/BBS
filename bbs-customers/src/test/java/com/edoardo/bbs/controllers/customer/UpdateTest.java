@@ -37,10 +37,9 @@ public class UpdateTest {
 
     private final MockMvc mockMvc;
     private CustomerDTO customer;
-    private Set<AddressDTO> addresses;
-    private ObjectMapper mapper;
-    private Faker faker;
-    private String baseUrl;
+    private final ObjectMapper mapper;
+    private final Faker faker;
+    private final String baseUrl;
 
 
     @Autowired
@@ -54,8 +53,8 @@ public class UpdateTest {
 
     @BeforeEach
     public void init () {
-        this.addresses = new HashSet<>();
-        this.addresses.add(AddressDTO.builder().country(this.faker.address().country())
+        Set<AddressDTO> addresses = new HashSet<>();
+        addresses.add(AddressDTO.builder().country(this.faker.address().country())
                 .state(this.faker.address().state())
                 .city(this.faker.address().city())
                 .street(this.faker.address().streetName())
