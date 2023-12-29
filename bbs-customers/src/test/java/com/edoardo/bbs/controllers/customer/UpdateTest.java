@@ -4,7 +4,6 @@ import com.edoardo.bbs.controllers.api.v1.CustomerController;
 import com.edoardo.bbs.dtos.AddressDTO;
 import com.edoardo.bbs.dtos.CustomerDTO;
 import com.edoardo.bbs.exceptions.ResourceNotFoundException;
-import com.edoardo.bbs.exceptions.ValidationException;
 import com.edoardo.bbs.services.CustomerService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.javafaker.Faker;
@@ -36,40 +35,41 @@ public class UpdateTest {
     @MockBean
     private CustomerService customerService;
 
-    private CustomerDTO customer;
-    private ObjectMapper mapper;
     private final MockMvc mockMvc;
-    private final String baseUrl;
+    private CustomerDTO customer;
+    private Set<AddressDTO> addresses;
+    private ObjectMapper mapper;
+    private Faker faker;
+    private String baseUrl;
 
 
     @Autowired
     public UpdateTest (MockMvc mockMvc, CustomerService customerService, ObjectMapper mapper) {
-        this.customerService = customerService;
         this.baseUrl = "/api/v1/customers/";
-        this.mockMvc = mockMvc;
         this.mapper = mapper;
+        this.mockMvc = mockMvc;
+        this.customerService = customerService;
+        this.faker = new Faker();
     }
 
     @BeforeEach
     public void init () {
-        Faker faker = new Faker();
-        Set<AddressDTO> addresses = new HashSet<>();
-        final AddressDTO newAddress = AddressDTO.builder().country(faker.address().country())
-                .state(faker.address().state())
-                .city(faker.address().city())
-                .street(faker.address().streetName())
-                .streetNumber(Integer.parseInt(faker.address().streetAddressNumber()))
-                .postalCode(faker.address().zipCode())
-                .build();
-        addresses.add(newAddress);
-        this.customer = CustomerDTO.builder().taxCode(faker.code().isbn10())
-                .firstName(faker.name().firstName())
-                .lastName(faker.name().lastName())
-                .email(faker.internet().emailAddress())
-                .birthDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
-                .emailVerifiedAt(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
-                .password(faker.internet().password())
-                .idCard(faker.file().fileName())
+        this.addresses = new HashSet<>();
+        this.addresses.add(AddressDTO.builder().country(this.faker.address().country())
+                .state(this.faker.address().state())
+                .city(this.faker.address().city())
+                .street(this.faker.address().streetName())
+                .streetNumber(Integer.parseInt(this.faker.address().streetAddressNumber()))
+                .postalCode(this.faker.address().zipCode())
+                .build());
+        this.customer = CustomerDTO.builder().taxCode(this.faker.code().isbn10())
+                .firstName(this.faker.name().firstName())
+                .lastName(this.faker.name().lastName())
+                .email(this.faker.internet().emailAddress())
+                .birthDate(this.faker.date().birthday(20, 80).toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
+                .emailVerifiedAt(this.faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
+                .password(this.faker.internet().password())
+                .idCard(this.faker.file().toString())
                 .addresses(addresses)
                 .build();
     }
@@ -84,6 +84,213 @@ public class UpdateTest {
 
         result.andExpect(MockMvcResultMatchers.status().isNotFound())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Not found.")))
+                .andDo(MockMvcResultHandlers.print());
+    }
+
+    @Test
+    public void testUpdateCustomerWithoutFirstNameReturnsValidationException () throws Exception {
+        this.customer.setFirstName(null);
+
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.put(this.baseUrl + customer.getTaxCode())
+                .content(this.mapper.writeValueAsString(this.customer))
+                .contentType(MediaType.APPLICATION_JSON));
+
+        result.andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Customer first name must not be null.")))
+                .andDo(MockMvcResultHandlers.print());
+    }
+
+    @Test
+    public void testUpdateCustomerWithoutLastNameReturnsValidationException () throws Exception {
+        this.customer.setLastName(null);
+
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.put(this.baseUrl + customer.getTaxCode())
+                .content(this.mapper.writeValueAsString(this.customer))
+                .contentType(MediaType.APPLICATION_JSON));
+
+        result.andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Customer last name must not be null.")))
+                .andDo(MockMvcResultHandlers.print());
+    }
+
+    @Test
+    public void testUpdateCustomerWithoutEmailReturnsValidationException () throws Exception {
+        this.customer.setEmail(null);
+
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.put(this.baseUrl + customer.getTaxCode())
+                .content(this.mapper.writeValueAsString(this.customer))
+                .contentType(MediaType.APPLICATION_JSON));
+
+        result.andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Customer email must not be null.")))
+                .andDo(MockMvcResultHandlers.print());
+    }
+
+    @Test
+    public void testUpdateCustomerWithoutPasswordReturnsValidationException () throws Exception {
+        this.customer.setPassword(null);
+
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.put(this.baseUrl + customer.getTaxCode())
+                .content(this.mapper.writeValueAsString(this.customer))
+                .contentType(MediaType.APPLICATION_JSON));
+
+        result.andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Customer password must not be null.")))
+                .andDo(MockMvcResultHandlers.print());
+    }
+
+    @Test
+    public void testUpdateCustomerWithoutIdCardReturnsValidationException () throws Exception {
+        this.customer.setIdCard(null);
+
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.put(this.baseUrl + customer.getTaxCode())
+                .content(this.mapper.writeValueAsString(this.customer))
+                .contentType(MediaType.APPLICATION_JSON));
+
+        result.andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Customer id card must not be null.")))
+                .andDo(MockMvcResultHandlers.print());
+    }
+
+    @Test
+    public void testUpdateCustomerWithBlankFirstNameReturnsValidationException () throws Exception {
+        this.customer.setFirstName("");
+
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.put(this.baseUrl + customer.getTaxCode())
+                .content(this.mapper.writeValueAsString(this.customer))
+                .contentType(MediaType.APPLICATION_JSON));
+
+        result.andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Customer first name length must be between 1 and 50 chars.")))
+                .andDo(MockMvcResultHandlers.print());
+    }
+
+    @Test
+    public void testUpdateCustomerWithBlankLastNameReturnsValidationException () throws Exception {
+        this.customer.setLastName("");
+
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.put(this.baseUrl + customer.getTaxCode())
+                .content(this.mapper.writeValueAsString(this.customer))
+                .contentType(MediaType.APPLICATION_JSON));
+
+        result.andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Customer last name length must be between 1 and 50 chars.")))
+                .andDo(MockMvcResultHandlers.print());
+    }
+
+    @Test
+    public void testUpdateCustomerWithBlankEmailReturnsValidationException () throws Exception {
+        this.customer.setEmail("");
+
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.put(this.baseUrl + customer.getTaxCode())
+                .content(this.mapper.writeValueAsString(this.customer))
+                .contentType(MediaType.APPLICATION_JSON));
+
+        result.andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Customer email length must be between 1 and 50 chars.")))
+                .andDo(MockMvcResultHandlers.print());
+    }
+
+    @Test
+    public void testUpdateCustomerWithBlankPasswordReturnsValidationException () throws Exception {
+        this.customer.setPassword("");
+
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.put(this.baseUrl + customer.getTaxCode())
+                .content(this.mapper.writeValueAsString(this.customer))
+                .contentType(MediaType.APPLICATION_JSON));
+
+        result.andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Customer password length must be between 1 and 50 chars.")))
+                .andDo(MockMvcResultHandlers.print());
+    }
+
+    @Test
+    public void testUpdateCustomerWithBlankIdCardReturnsValidationException () throws Exception {
+        this.customer.setIdCard("");
+
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.put(this.baseUrl + customer.getTaxCode())
+                .content(this.mapper.writeValueAsString(this.customer))
+                .contentType(MediaType.APPLICATION_JSON));
+
+        result.andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Customer id card length must not be empty.")))
+                .andDo(MockMvcResultHandlers.print());
+    }
+
+    @Test
+    public void testUpdateCustomerWithInvalidFirstNameLengthReturnsValidationException () throws Exception {
+        this.customer.setFirstName(faker.lorem().characters(51));
+
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.put(this.baseUrl + customer.getTaxCode())
+                .content(this.mapper.writeValueAsString(this.customer))
+                .contentType(MediaType.APPLICATION_JSON));
+
+        result.andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Customer first name length must be between 1 and 50 chars.")))
+                .andDo(MockMvcResultHandlers.print());
+    }
+
+    @Test
+    public void testUpdateCustomerWithInvalidLastNameLengthReturnsValidationException () throws Exception {
+        this.customer.setLastName(faker.lorem().characters(51));
+
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.put(this.baseUrl + customer.getTaxCode())
+                .content(this.mapper.writeValueAsString(this.customer))
+                .contentType(MediaType.APPLICATION_JSON));
+
+        result.andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Customer last name length must be between 1 and 50 chars.")))
+                .andDo(MockMvcResultHandlers.print());
+    }
+
+    @Test
+    public void testUpdateCustomerWithInvalidEmailLengthReturnsValidationException () throws Exception {
+        this.customer.setEmail("notValidEmailAddress.notValidDomainAddress@NotValidEmail.com");
+
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.put(this.baseUrl + customer.getTaxCode())
+                .content(this.mapper.writeValueAsString(this.customer))
+                .contentType(MediaType.APPLICATION_JSON));
+
+        result.andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Customer email length must be between 1 and 50 chars.")))
+                .andDo(MockMvcResultHandlers.print());
+    }
+
+    @Test
+    public void testUpdateCustomerWithInvalidPasswordLengthReturnsValidationException () throws Exception {
+        this.customer.setPassword(this.faker.lorem().characters(51));
+
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.put(this.baseUrl + customer.getTaxCode())
+                .content(this.mapper.writeValueAsString(this.customer))
+                .contentType(MediaType.APPLICATION_JSON));
+
+        result.andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Customer password length must be between 1 and 50 chars.")))
+                .andDo(MockMvcResultHandlers.print());
+    }
+    @Test
+    public void testUpdateCustomerWithInvalidEmailReturnsValidationException () throws Exception {
+        this.customer.setEmail(this.faker.lorem().characters(20));
+
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.put(this.baseUrl + customer.getTaxCode())
+                .content(this.mapper.writeValueAsString(this.customer))
+                .contentType(MediaType.APPLICATION_JSON));
+
+        result.andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Customer email must be valid.")))
+                .andDo(MockMvcResultHandlers.print());
+    }
+
+    @Test
+    public void testUpdateCustomerNotAdultReturnsValidationException () throws Exception {
+        this.customer.setBirthDate(this.faker.date().birthday(10, 17).toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.put(this.baseUrl + customer.getTaxCode())
+                .content(this.mapper.writeValueAsString(this.customer))
+                .contentType(MediaType.APPLICATION_JSON));
+
+        result.andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Customer must be adult.")))
                 .andDo(MockMvcResultHandlers.print());
     }
 

@@ -54,7 +54,7 @@ public class CustomerController {
 
     @PostMapping(value = "/customers", produces = "application/json") @SneakyThrows
     public ResponseEntity<Void> postCustomer (
-            @Valid  @RequestBody CustomerDTO customer, UriComponentsBuilder uriBuilder
+            @Valid @RequestBody CustomerDTO customer, UriComponentsBuilder uriBuilder
     ) {
         final CustomerDTO savedCustomer = this.customerService.createCustomer(customer);
         final URI customerURI = uriBuilder.path("/customers/{id}").buildAndExpand(savedCustomer.getTaxCode()).toUri();
@@ -64,13 +64,9 @@ public class CustomerController {
     @PutMapping(value = "/customers/{taxCode}", produces = "application/json") @SneakyThrows
     public ResponseEntity<CustomerDTO> putCustomer (
             @PathVariable String taxCode,
-            @Valid @RequestBody CustomerDTO updatedCustomer,
-            Errors validationErrors
+            @Valid @RequestBody CustomerDTO updatedCustomer
     ) {
-        if (!validationErrors.hasErrors()) {
-            return ResponseEntity.ok(this.customerService.updateCustomer(taxCode, updatedCustomer));
-        }
-        throw new ValidationException(validationErrors.getFieldError().getDefaultMessage());
+        return ResponseEntity.ok(this.customerService.updateCustomer(taxCode, updatedCustomer));
     }
 
     @DeleteMapping(value = "/customers/{taxCode}") @SneakyThrows

@@ -10,6 +10,8 @@ import java.util.Set;
 
 @Data @Builder
 public class CustomerDTO {
+
+    @NotNull(message = "Customer first name must not be null.")
     private String taxCode;
 
     @NotNull(message = "Customer first name must not be null.")
