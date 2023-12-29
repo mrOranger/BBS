@@ -1,6 +1,7 @@
 package com.edoardo.bbs.dtos;
 
-import jakarta.validation.constraints.NotEmpty;
+import com.edoardo.bbs.validation.rules.BirthDateValid;
+import jakarta.validation.constraints.*;
 import lombok.Builder;
 import lombok.Data;
 
@@ -11,23 +12,33 @@ import java.util.Set;
 public class CustomerDTO {
     private String taxCode;
 
-    @NotEmpty(message = "Customer first name must not be empty.")
+    @NotNull(message = "Customer first name must not be null.")
+    @Size(min = 1, max = 50, message = "Customer first name length must be between 1 and 50 chars.")
     private String firstName;
 
-    @NotEmpty(message = "Customer last name must not be empty.")
+    @NotNull(message = "Customer last name must not be null.")
+    @Size(min = 1, max = 50, message = "Customer last name length must be between 1 and 50 chars.")
     private String lastName;
 
+    @NotNull(message = "Customer last name must not be null.")
+    @BirthDateValid
     private LocalDate birthDate;
 
-    @NotEmpty(message = "Customer email must not be empty.")
+    @NotNull(message = "Customer email must not be null.")
+    @Size(min = 1, max = 50, message = "Customer email length must be between 1 and 50 chars.")
+    @Email(message = "Customer email must be valid.")
     private String email;
+
     private LocalDate emailVerifiedAt;
 
-    @NotEmpty(message = "Customer password must not be empty.")
+    @NotNull(message = "Customer password must not be null.")
+    @Size(min = 1, max = 50, message = "Customer password length must be between 1 and 50 chars.")
     private String password;
 
-    @NotEmpty(message = "Customer id card must not be empty.")
+    @NotNull(message = "Customer id card must not be null.")
+    @Size(min = 1, message = "Customer id card length must not be empty.")
     private String idCard;
 
+    @NotEmpty(message = "Customer addresses cannot be empty.")
     private Set<AddressDTO> addresses;
 }

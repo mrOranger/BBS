@@ -26,6 +26,7 @@ import org.springframework.test.web.servlet.result.MockMvcResultMatchers;
 import java.time.ZoneId;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.TimeUnit;
 
 import static org.mockito.Mockito.when;
 
@@ -36,9 +37,9 @@ public class SaveTest {
     @MockBean
     private CustomerService customerService;
 
-
     private final MockMvc mockMvc;
     private CustomerDTO customer;
+    private Set<AddressDTO> addresses;
     private ObjectMapper mapper;
     private Faker faker;
 
@@ -52,20 +53,19 @@ public class SaveTest {
 
     @BeforeEach
     public void init () {
-        Set<AddressDTO> addresses = new HashSet<>();
-        final AddressDTO newAddress = AddressDTO.builder().country(this.faker.address().country())
+        this.addresses = new HashSet<>();
+        this.addresses.add(AddressDTO.builder().country(this.faker.address().country())
                 .state(this.faker.address().state())
                 .city(this.faker.address().city())
                 .street(this.faker.address().streetName())
                 .streetNumber(Integer.parseInt(this.faker.address().streetAddressNumber()))
                 .postalCode(this.faker.address().zipCode())
-                .build();
-        addresses.add(newAddress);
+                .build());
         this.customer = CustomerDTO.builder().taxCode(this.faker.code().isbn10())
                 .firstName(this.faker.name().firstName())
                 .lastName(this.faker.name().lastName())
                 .email(this.faker.internet().emailAddress())
-                .birthDate(this.faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
+                .birthDate(this.faker.date().birthday(20, 80).toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
                 .emailVerifiedAt(this.faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
                 .password(this.faker.internet().password())
                 .idCard(this.faker.file().toString())
@@ -88,21 +88,208 @@ public class SaveTest {
 
     @Test
     public void testSaveCustomerWithoutFirstNameReturnsValidationException () throws Exception {
-        this.customer = CustomerDTO.builder().taxCode(faker.code().isbn10())
-                .lastName(faker.name().lastName())
-                .email(faker.internet().emailAddress())
-                .birthDate(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
-                .emailVerifiedAt(faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
-                .password(faker.internet().password())
-                .idCard(faker.file().toString())
-                .build();
+        this.customer.setFirstName(null);
 
         ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/customers")
                 .content(this.mapper.writeValueAsString(this.customer))
                 .contentType(MediaType.APPLICATION_JSON));
 
         result.andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Customer first name must not be empty.")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Customer first name must not be null.")))
+                .andDo(MockMvcResultHandlers.print());
+    }
+
+    @Test
+    public void testSaveCustomerWithoutLastNameReturnsValidationException () throws Exception {
+        this.customer.setLastName(null);
+
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/customers")
+                .content(this.mapper.writeValueAsString(this.customer))
+                .contentType(MediaType.APPLICATION_JSON));
+
+        result.andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Customer last name must not be null.")))
+                .andDo(MockMvcResultHandlers.print());
+    }
+
+    @Test
+    public void testSaveCustomerWithoutEmailReturnsValidationException () throws Exception {
+        this.customer.setEmail(null);
+
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/customers")
+                .content(this.mapper.writeValueAsString(this.customer))
+                .contentType(MediaType.APPLICATION_JSON));
+
+        result.andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Customer email must not be null.")))
+                .andDo(MockMvcResultHandlers.print());
+    }
+
+    @Test
+    public void testSaveCustomerWithoutPasswordReturnsValidationException () throws Exception {
+        this.customer.setPassword(null);
+
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/customers")
+                .content(this.mapper.writeValueAsString(this.customer))
+                .contentType(MediaType.APPLICATION_JSON));
+
+        result.andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Customer password must not be null.")))
+                .andDo(MockMvcResultHandlers.print());
+    }
+
+    @Test
+    public void testSaveCustomerWithoutIdCardReturnsValidationException () throws Exception {
+        this.customer.setIdCard(null);
+
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/customers")
+                .content(this.mapper.writeValueAsString(this.customer))
+                .contentType(MediaType.APPLICATION_JSON));
+
+        result.andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Customer id card must not be null.")))
+                .andDo(MockMvcResultHandlers.print());
+    }
+
+    @Test
+    public void testSaveCustomerWithBlankFirstNameReturnsValidationException () throws Exception {
+        this.customer.setFirstName("");
+
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/customers")
+                .content(this.mapper.writeValueAsString(this.customer))
+                .contentType(MediaType.APPLICATION_JSON));
+
+        result.andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Customer first name length must be between 1 and 50 chars.")))
+                .andDo(MockMvcResultHandlers.print());
+    }
+
+    @Test
+    public void testSaveCustomerWithBlankLastNameReturnsValidationException () throws Exception {
+        this.customer.setLastName("");
+
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/customers")
+                .content(this.mapper.writeValueAsString(this.customer))
+                .contentType(MediaType.APPLICATION_JSON));
+
+        result.andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Customer last name length must be between 1 and 50 chars.")))
+                .andDo(MockMvcResultHandlers.print());
+    }
+
+    @Test
+    public void testSaveCustomerWithBlankEmailReturnsValidationException () throws Exception {
+        this.customer.setEmail("");
+
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/customers")
+                .content(this.mapper.writeValueAsString(this.customer))
+                .contentType(MediaType.APPLICATION_JSON));
+
+        result.andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Customer email length must be between 1 and 50 chars.")))
+                .andDo(MockMvcResultHandlers.print());
+    }
+
+    @Test
+    public void testSaveCustomerWithBlankPasswordReturnsValidationException () throws Exception {
+        this.customer.setPassword("");
+
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/customers")
+                .content(this.mapper.writeValueAsString(this.customer))
+                .contentType(MediaType.APPLICATION_JSON));
+
+        result.andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Customer password length must be between 1 and 50 chars.")))
+                .andDo(MockMvcResultHandlers.print());
+    }
+
+    @Test
+    public void testSaveCustomerWithBlankIdCardReturnsValidationException () throws Exception {
+        this.customer.setIdCard("");
+
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/customers")
+                .content(this.mapper.writeValueAsString(this.customer))
+                .contentType(MediaType.APPLICATION_JSON));
+
+        result.andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Customer id card length must not be empty.")))
+                .andDo(MockMvcResultHandlers.print());
+    }
+
+    @Test
+    public void testSaveCustomerWithInvalidFirstNameLengthReturnsValidationException () throws Exception {
+        this.customer.setFirstName(faker.lorem().characters(51));
+
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/customers")
+                .content(this.mapper.writeValueAsString(this.customer))
+                .contentType(MediaType.APPLICATION_JSON));
+
+        result.andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Customer first name length must be between 1 and 50 chars.")))
+                .andDo(MockMvcResultHandlers.print());
+    }
+
+    @Test
+    public void testSaveCustomerWithInvalidLastNameLengthReturnsValidationException () throws Exception {
+        this.customer.setLastName(faker.lorem().characters(51));
+
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/customers")
+                .content(this.mapper.writeValueAsString(this.customer))
+                .contentType(MediaType.APPLICATION_JSON));
+
+        result.andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Customer last name length must be between 1 and 50 chars.")))
+                .andDo(MockMvcResultHandlers.print());
+    }
+
+    @Test
+    public void testSaveCustomerWithInvalidEmailLengthReturnsValidationException () throws Exception {
+        this.customer.setEmail("notValidEmailAddress.notValidDomainAddress@NotValidEmail.com");
+
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/customers")
+                .content(this.mapper.writeValueAsString(this.customer))
+                .contentType(MediaType.APPLICATION_JSON));
+
+        result.andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Customer email length must be between 1 and 50 chars.")))
+                .andDo(MockMvcResultHandlers.print());
+    }
+
+    @Test
+    public void testSaveCustomerWithInvalidPasswordLengthReturnsValidationException () throws Exception {
+        this.customer.setPassword(this.faker.lorem().characters(51));
+
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/customers")
+                .content(this.mapper.writeValueAsString(this.customer))
+                .contentType(MediaType.APPLICATION_JSON));
+
+        result.andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Customer password length must be between 1 and 50 chars.")))
+                .andDo(MockMvcResultHandlers.print());
+    }
+    @Test
+    public void testSaveCustomerWithInvalidEmailReturnsValidationException () throws Exception {
+        this.customer.setEmail(this.faker.lorem().characters(20));
+
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/customers")
+                .content(this.mapper.writeValueAsString(this.customer))
+                .contentType(MediaType.APPLICATION_JSON));
+
+        result.andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Customer email must be valid.")))
+                .andDo(MockMvcResultHandlers.print());
+    }
+
+    @Test
+    public void testSaveCustomerNotAdultReturnsValidationException () throws Exception {
+        this.customer.setBirthDate(this.faker.date().birthday(10, 17).toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
+
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/customers")
+                .content(this.mapper.writeValueAsString(this.customer))
+                .contentType(MediaType.APPLICATION_JSON));
+
+        result.andExpect(MockMvcResultMatchers.status().isBadRequest())
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Customer must be adult.")))
                 .andDo(MockMvcResultHandlers.print());
     }
 

@@ -9,6 +9,6 @@ import java.time.temporal.ChronoUnit;
 public class CustomerValidator implements ConstraintValidator<BirthDateValid, LocalDate> {
     @Override
     public boolean isValid(LocalDate value, ConstraintValidatorContext context) {
-        return ChronoUnit.YEARS.between(LocalDate.now(), value) > 17;
+        return ChronoUnit.YEARS.between(value, LocalDate.now()) > 17;
     }
 }
