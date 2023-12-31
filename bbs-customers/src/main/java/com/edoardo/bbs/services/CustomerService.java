@@ -1,7 +1,9 @@
 package com.edoardo.bbs.services;
 
+import com.edoardo.bbs.dtos.AddressDTO;
 import com.edoardo.bbs.dtos.CustomerDTO;
 import com.edoardo.bbs.dtos.CustomerResponse;
+import com.edoardo.bbs.exceptions.MaximumAddressNumberException;
 import com.edoardo.bbs.exceptions.ResourceConflictException;
 import com.edoardo.bbs.exceptions.ResourceNotFoundException;
 import org.springframework.data.domain.Pageable;

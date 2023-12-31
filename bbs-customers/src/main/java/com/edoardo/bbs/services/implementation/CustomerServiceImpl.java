@@ -24,7 +24,7 @@ public class CustomerServiceImpl implements CustomerService {
     private final CustomerMapper customerModelMapper;
 
     @Autowired
-    public CustomerServiceImpl (CustomerRepository customerRepository, CustomerMapper customerModelMapper) {
+    public CustomerServiceImpl(CustomerRepository customerRepository, CustomerMapper customerModelMapper) {
         this.customerRepository = customerRepository;
         this.customerModelMapper = customerModelMapper;
     }
@@ -131,13 +131,13 @@ public class CustomerServiceImpl implements CustomerService {
 
             return this.customerModelMapper.convertToDTO(this.customerRepository.save(customerEntity));
         }
-        throw new ResourceNotFoundException ("Not found.");
+        throw new ResourceNotFoundException("Not found.");
     }
 
     @Override
     public CustomerDTO deleteCustomer(String taxCode) throws ResourceNotFoundException {
         final Optional<Customer> existingCustomer = this.customerRepository.findById(taxCode);
-        if (!existingCustomer.isPresent()) {
+        if (existingCustomer.isEmpty()) {
             throw new ResourceNotFoundException();
         }
         this.customerRepository.delete(existingCustomer.get());
