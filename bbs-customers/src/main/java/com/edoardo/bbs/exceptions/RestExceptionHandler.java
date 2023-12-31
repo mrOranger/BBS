@@ -24,4 +24,9 @@ public class RestExceptionHandler {
     protected ResponseEntity<Object> handleHandlerMethodValidationException(MethodArgumentNotValidException exception) {
         return new ResponseEntity<>(new ErrorResponse(exception.getBindingResult().getFieldErrors().get(0).getDefaultMessage()), HttpStatus.BAD_REQUEST);
     }
+
+    @ExceptionHandler(MaximumAddressNumberException.class)
+    protected ResponseEntity<ErrorResponse> maximumNumberOfAddressException (MaximumAddressNumberException exception) {
+        return new ResponseEntity<>(new ErrorResponse(exception.getMessage()), HttpStatus.BAD_REQUEST);
+    }
 }
