@@ -5,7 +5,7 @@ import com.edoardo.bbs.entities.Customer;
 import com.edoardo.bbs.repositories.AddressRepository;
 import com.edoardo.bbs.repositories.CustomerRepository;
 import com.github.javafaker.Faker;
-import org.junit.jupiter.api.Assertions;
+import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,15 +19,15 @@ import java.util.Optional;
 
 @DataJpaTest
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
-public class DeleteTest {
+public class FindByIdTest {
     private final Faker faker;
-    private Customer customer;
     private Address address;
+    private Customer customer;
     private final AddressRepository addressRepository;
     private final CustomerRepository customerRepository;
 
     @Autowired
-    public DeleteTest(AddressRepository addressRepository, CustomerRepository customerRepository) {
+    public FindByIdTest(AddressRepository addressRepository, CustomerRepository customerRepository) {
         this.addressRepository = addressRepository;
         this.customerRepository = customerRepository;
         this.faker = new Faker();
@@ -44,7 +44,17 @@ public class DeleteTest {
                 .password(this.faker.internet().password())
                 .idCard(this.faker.file().toString())
                 .build();
+    }
 
+    @Test
+    public void findByIdReturnsNoneAddress () {
+        final Optional<Address> customer = this.addressRepository.findById(this.faker.code().isbn10());
+
+        Assertions.assertThat(customer.isEmpty()).isEqualTo(true);
+    }
+
+    @Test
+    public void findByIdReturnsOneAddress () {
         this.address = Address.builder()
                 .country(this.faker.address().country())
                 .state(this.faker.address().state())
@@ -53,20 +63,13 @@ public class DeleteTest {
                 .streetNumber(Integer.parseInt(this.faker.address().streetAddressNumber()))
                 .postalCode(this.faker.address().zipCode())
                 .build();
-    }
 
-    @Test
-    public void testDeleteAddressSuccess () {
         this.address.setCustomer(this.customer);
         this.customerRepository.save(this.customer);
-        this.addressRepository.save(this.address);
+        final Address updatedAddress = this.addressRepository.save(this.address);
 
-        this.addressRepository.delete(this.address);
+        final Optional<Address> customer = this.addressRepository.findById(this.address.getId().toString());
 
-        final Optional<Customer> updatedCustomer = this.customerRepository.findById(this.customer.getTaxCode());
-        final Optional<Address> updatedAddress = this.addressRepository.findById(this.address.getId().toString());
-        Assertions.assertTrue(updatedAddress.isEmpty());
-        Assertions.assertEquals(updatedCustomer.get().getTaxCode(), this.customer.getTaxCode());
-        Assertions.assertNull(updatedCustomer.get().getAddresses());
+        Assertions.assertThat(customer.isEmpty()).isEqualTo(false);
     }
 }
