@@ -21,17 +21,17 @@ public class AddressServiceImpl implements AddressService {
 
 
     @Override
-    public AddressDTO addAddress(String taxCode, AddressDTO address) throws MaximumAddressNumberException {
+    public AddressDTO addAddress(String taxCode, AddressDTO address) throws MaximumAddressNumberException, ResourceNotFoundException {
         return null;
     }
 
     @Override
-    public AddressDTO updateAddress(String taxCode, AddressDTO address) throws ResourceNotFoundException {
+    public AddressDTO updateAddress(String taxCode, String addressId, AddressDTO address) throws ResourceNotFoundException {
         return null;
     }
 
     @Override
-    public AddressDTO deleteAddress(String taxCode, AddressDTO address) throws ResourceNotFoundException {
+    public AddressDTO deleteAddress(String taxCode, String addressId) throws ResourceNotFoundException {
         return null;
     }
 }
