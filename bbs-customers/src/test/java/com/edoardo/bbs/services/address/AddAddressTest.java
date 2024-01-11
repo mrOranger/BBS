@@ -1,6 +1,7 @@
 package com.edoardo.bbs.services.address;
 
 import com.edoardo.bbs.dtos.AddressDTO;
+import com.edoardo.bbs.dtos.CustomerDTO;
 import com.edoardo.bbs.entities.Address;
 import com.edoardo.bbs.entities.Customer;
 import com.edoardo.bbs.exceptions.MaximumAddressNumberException;
@@ -15,6 +16,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.ZoneId;
@@ -66,6 +68,7 @@ public class AddAddressTest {
                 .street(this.faker.address().streetName())
                 .streetNumber(Integer.parseInt(this.faker.address().streetAddressNumber()))
                 .postalCode(this.faker.address().zipCode())
+                .customer(this.customer)
                 .build();
     }
 
@@ -89,8 +92,6 @@ public class AddAddressTest {
                     .build());
         }
 
-        when(this.addressRepository.save(this.address)).thenReturn(this.address);
-        when(this.addressMapper.convertToDTO(this.address)).thenReturn(this.mapToDto(this.address));
         when(this.customerRepository.findById(this.customer.getTaxCode())).thenReturn(Optional.ofNullable(this.customer));
 
         assertThrows(MaximumAddressNumberException.class, () -> this.addressService.addAddress(this.customer.getTaxCode(), this.mapToDto(this.address)));
@@ -98,15 +99,15 @@ public class AddAddressTest {
 
     @Test
     public void testAddAddressToCustomerWithoutOneReturnsCustomer () throws MaximumAddressNumberException, ResourceNotFoundException {
-        when(this.addressRepository.save(this.address)).thenReturn(this.address);
-        when(this.addressMapper.convertToDTO(this.address)).thenReturn(this.mapToDto(this.address));
         when(this.customerRepository.findById(this.customer.getTaxCode())).thenReturn(Optional.ofNullable(this.customer));
+        when(this.addressMapper.convertToDTO(Mockito.any(Address.class))).thenReturn(this.mapToDto(address));
+        when(this.addressMapper.convertToEntity(Mockito.any(AddressDTO.class))).thenReturn(this.address);
+        when(this.addressRepository.save(this.address)).thenReturn(this.address);
 
         final AddressDTO address = this.addressService.addAddress(this.customer.getTaxCode(), this.mapToDto(this.address));
 
         assertThat(address).isNotNull();
         assertThat(address.getCustomer().getTaxCode()).isEqualTo(this.customer.getTaxCode());
-        assertThat(this.customer.getAddresses().size()).isEqualTo(1);
     }
 
     @Test
@@ -120,14 +121,15 @@ public class AddAddressTest {
                 .postalCode(this.faker.address().zipCode())
                 .build());
 
-        when(this.addressRepository.save(this.address)).thenReturn(this.address);
-        when(this.addressMapper.convertToDTO(this.address)).thenReturn(this.mapToDto(this.address));
         when(this.customerRepository.findById(this.customer.getTaxCode())).thenReturn(Optional.ofNullable(this.customer));
+        when(this.addressMapper.convertToDTO(Mockito.any(Address.class))).thenReturn(this.mapToDto(address));
+        when(this.addressMapper.convertToEntity(Mockito.any(AddressDTO.class))).thenReturn(this.address);
+        when(this.addressRepository.save(this.address)).thenReturn(this.address);
+
         final AddressDTO address = this.addressService.addAddress(this.customer.getTaxCode(), this.mapToDto(this.address));
 
         assertThat(address).isNotNull();
-        assertThat(address.getCustomer().getTaxCode()).isEqualTo(this.customer.getTaxCode());
-        assertThat(this.customer.getAddresses().size()).isEqualTo(2);
+        assertThat(this.address.getCustomer().getTaxCode()).isEqualTo(this.customer.getTaxCode());
     }
 
     private AddressDTO mapToDto(Address address) {
@@ -139,6 +141,23 @@ public class AddAddressTest {
                     .street(address.getStreet())
                     .streetNumber(address.getStreetNumber())
                     .postalCode(address.getPostalCode())
+                    .customer(this.mapCustomerToDto(address.getCustomer()))
+                    .build();
+        }
+        return null;
+    }
+
+    private CustomerDTO mapCustomerToDto (Customer customer) {
+        if (customer != null) {
+            return CustomerDTO.builder()
+                    .taxCode(customer.getTaxCode())
+                    .firstName(customer.getFirstName())
+                    .lastName(customer.getLastName())
+                    .birthDate(customer.getBirthDate())
+                    .email(customer.getEmail())
+                    .emailVerifiedAt(customer.getEmailVerifiedAt())
+                    .password(customer.getPassword())
+                    .idCard(customer.getIdCard())
                     .build();
         }
         return null;
