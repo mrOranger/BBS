@@ -6,7 +6,6 @@ import com.edoardo.bbs.entities.Address;
 import com.edoardo.bbs.entities.Customer;
 import com.edoardo.bbs.exceptions.ResourceNotFoundException;
 import com.edoardo.bbs.mapper.AddressMapper;
-import com.edoardo.bbs.repositories.AddressRepository;
 import com.edoardo.bbs.repositories.CustomerRepository;
 import com.edoardo.bbs.services.implementation.AddressServiceImpl;
 import com.github.javafaker.Faker;
@@ -34,8 +33,6 @@ public class DeleteAddressTest {
     private AddressMapper addressMapper;
     @Mock
     private CustomerRepository customerRepository;
-    @Mock
-    private AddressRepository addressRepository;
     @InjectMocks
     private AddressServiceImpl addressService;
 
@@ -86,7 +83,7 @@ public class DeleteAddressTest {
     }
 
     @Test
-    public void testDeleteAddressToCustomerWithOneReturnsCustomer () throws ResourceNotFoundException {
+    public void testDeleteAddressToCustomerWithOneReturnsAddress () throws ResourceNotFoundException {
         this.customer.getAddresses().add(this.address);
 
         when(this.customerRepository.findById(this.customer.getTaxCode())).thenReturn(Optional.ofNullable(this.customer));

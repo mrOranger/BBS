@@ -111,7 +111,7 @@ public class AddAddressTest {
     }
 
     @Test
-    public void testAddAddressToCustomerWithOneReturnsCustomer () throws MaximumAddressNumberException, ResourceNotFoundException {
+    public void testAddAddressToCustomerWithOneReturnsAddress () throws MaximumAddressNumberException, ResourceNotFoundException {
         this.customer.getAddresses().add(Address.builder()
                 .country(this.faker.address().country())
                 .state(this.faker.address().state())
