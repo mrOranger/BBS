@@ -1,6 +1,7 @@
 package com.edoardo.bbs.controllers.address;
 
 
+import com.edoardo.bbs.controllers.api.v1.AddressController;
 import com.edoardo.bbs.dtos.AddressDTO;
 import com.edoardo.bbs.exceptions.MaximumAddressNumberException;
 import com.edoardo.bbs.exceptions.ResourceNotFoundException;
@@ -12,6 +13,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.junit.jupiter.MockitoExtension;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
@@ -28,17 +30,19 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class AddAddressTest {
     @MockBean
-    private AddressService addressService;
+    private final AddressService addressService;
 
     private final ObjectMapper mapper;
     private AddressDTO addressDTO;
     private final MockMvc mockMvc;
     private final Faker faker;
 
-    public AddAddressTest (ObjectMapper objectMapper, Faker faker, MockMvc mockMvc) {
-        this.faker = faker;
-        this.mockMvc = mockMvc;
+    @Autowired
+    public AddAddressTest (ObjectMapper objectMapper, MockMvc mockMvc, AddressService addressService) {
+        this.addressService = addressService;
         this.mapper = objectMapper;
+        this.faker = new Faker();
+        this.mockMvc = mockMvc;
     }
 
     @BeforeEach
@@ -56,7 +60,7 @@ public class AddAddressTest {
     @Test
     public void testAddAddressToNotExistingCustomerReturnsNotFound () throws Exception {
         final String taxCode = this.faker.code().isbn10();
-        when(this.addressService.addAddress(taxCode, this.addressDTO)).thenThrow(ResourceNotFoundException.class);
+        when(this.addressService.addAddress(taxCode, this.addressDTO)).thenThrow(new ResourceNotFoundException("Customer " + taxCode + " not found."));
 
 
         ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.patch("/api/v1/addresses/customer/{taxCode}", taxCode)
@@ -70,14 +74,14 @@ public class AddAddressTest {
     @Test
     public void testAddAddressToCustomerWithAlreadyThreeAddressReturnsBadRequest () throws Exception{
         final String taxCode = this.faker.code().isbn10();
-        when(this.addressService.addAddress(taxCode, this.addressDTO)).thenThrow(MaximumAddressNumberException.class);
+        when(this.addressService.addAddress(taxCode, this.addressDTO)).thenThrow(new MaximumAddressNumberException("Maximum number of addresses."));
 
 
         ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.patch("/api/v1/addresses/customer/{taxCode}", taxCode)
                 .content(this.mapper.writeValueAsString(this.addressDTO))
                 .contentType(MediaType.APPLICATION_JSON));
 
-        result.andExpect(MockMvcResultMatchers.status().isNotFound())
+        result.andExpect(MockMvcResultMatchers.status().isBadRequest())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Maximum number of addresses.")));
     }
 
@@ -247,7 +251,7 @@ public class AddAddressTest {
                 .contentType(MediaType.APPLICATION_JSON));
 
         result.andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Address street number must be positive.")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Address street number must be greater than or equal to 1.")))
                 .andDo(MockMvcResultHandlers.print());
     }
 
