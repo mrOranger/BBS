@@ -27,4 +27,13 @@ public class AddressController {
     ) {
         return ResponseEntity.ok(this.addressService.addAddress(customer, address));
     }
+
+    @PutMapping(value = "/addresses/address/{address}/customer/{customer}", produces = "application/json") @SneakyThrows
+    public ResponseEntity<AddressDTO> updateAddressCustomer (
+            @PathVariable String address,
+            @PathVariable String customer,
+            @Valid @RequestBody AddressDTO addressDTO
+    ) {
+        return ResponseEntity.ok(this.addressService.updateAddress(customer, address, addressDTO));
+    }
 }
