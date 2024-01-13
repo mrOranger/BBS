@@ -59,26 +59,28 @@ public class UpdateAddressTest {
     @Test
     public void testUpdateNotExistingAddressReturnsNotFound () throws Exception {
         final String taxCode = this.faker.code().isbn10();
-        final int addressId = this.faker.number().randomDigit();
-        when(this.addressService.addAddress(taxCode, this.addressDTO)).thenThrow(new ResourceNotFoundException("Address " + addressId + " not found."));
+        final String address = Integer.toString(this.faker.number().randomDigit());
+        when(this.addressService.updateAddress(taxCode, address, addressDTO))
+                .thenThrow(new ResourceNotFoundException("Address " + address + " not found."));
 
         ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
-                .put("/api/v1/addresses/address/{id}customer/{taxCode}", addressId, taxCode)
+                .put("/api/v1/addresses/address/{id}/customer/{taxCode}", address, taxCode)
                 .content(this.mapper.writeValueAsString(this.addressDTO))
                 .contentType(MediaType.APPLICATION_JSON));
 
         result.andExpect(MockMvcResultMatchers.status().isNotFound())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Address " + addressId + " not found.")));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Address " + address + " not found.")));
     }
 
     @Test
     public void testUpdateAddressWithNotExistingCustomerReturnsNotFound () throws Exception {
         final String taxCode = this.faker.code().isbn10();
-        final int addressId = this.faker.number().randomDigit();
-        when(this.addressService.addAddress(taxCode, this.addressDTO)).thenThrow(new ResourceNotFoundException("Customer " + taxCode + " not found."));
+        final String addressId = Integer.toString(this.faker.number().randomDigit());
+        when(this.addressService.updateAddress(taxCode, addressId, this.addressDTO))
+                .thenThrow(new ResourceNotFoundException("Customer " + taxCode + " not found."));
 
         ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
-                .put("/api/v1/addresses/address/{id}customer/{taxCode}", addressId, taxCode)
+                .put("/api/v1/addresses/address/{id}/customer/{taxCode}", addressId, taxCode)
                 .content(this.mapper.writeValueAsString(this.addressDTO))
                 .contentType(MediaType.APPLICATION_JSON));
 
@@ -92,10 +94,11 @@ public class UpdateAddressTest {
         this.addressDTO.setCountry(null);
         AddressDTO savedAddress = this.addressDTO;
         savedAddress.setId(this.faker.number().randomDigit());
-        when(this.addressService.addAddress(taxCode, this.addressDTO)).thenReturn(savedAddress);
+        when(this.addressService.updateAddress(taxCode, this.addressDTO.getId().toString(), this.addressDTO))
+                .thenReturn(savedAddress);
 
         ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
-                .put("/api/v1/addresses/address/{id}customer/{taxCode}", addressDTO.getId(), taxCode)
+                .put("/api/v1/addresses/address/{id}/customer/{taxCode}", addressDTO.getId(), taxCode)
                 .content(this.mapper.writeValueAsString(this.addressDTO))
                 .contentType(MediaType.APPLICATION_JSON));
 
@@ -110,10 +113,11 @@ public class UpdateAddressTest {
         this.addressDTO.setCountry(this.faker.lorem().sentence(200));
         AddressDTO savedAddress = this.addressDTO;
         savedAddress.setId(this.faker.number().randomDigit());
-        when(this.addressService.addAddress(taxCode, this.addressDTO)).thenReturn(savedAddress);
+        when(this.addressService.updateAddress(taxCode, this.addressDTO.getId().toString(), this.addressDTO))
+                .thenReturn(savedAddress);
 
         ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
-                .put("/api/v1/addresses/address/{id}customer/{taxCode}", addressDTO.getId(), taxCode)
+                .put("/api/v1/addresses/address/{id}/customer/{taxCode}", addressDTO.getId(), taxCode)
                 .content(this.mapper.writeValueAsString(this.addressDTO))
                 .contentType(MediaType.APPLICATION_JSON));
 
@@ -128,10 +132,11 @@ public class UpdateAddressTest {
         this.addressDTO.setState(null);
         AddressDTO savedAddress = this.addressDTO;
         savedAddress.setId(this.faker.number().randomDigit());
-        when(this.addressService.addAddress(taxCode, this.addressDTO)).thenReturn(savedAddress);
+        when(this.addressService.updateAddress(taxCode, this.addressDTO.getId().toString(), this.addressDTO))
+                .thenReturn(savedAddress);
 
         ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
-                .put("/api/v1/addresses/address/{id}customer/{taxCode}", addressDTO.getId(), taxCode)
+                .put("/api/v1/addresses/address/{id}/customer/{taxCode}", addressDTO.getId(), taxCode)
                 .content(this.mapper.writeValueAsString(this.addressDTO))
                 .contentType(MediaType.APPLICATION_JSON));
 
@@ -146,10 +151,11 @@ public class UpdateAddressTest {
         this.addressDTO.setState(this.faker.lorem().sentence(200));
         AddressDTO savedAddress = this.addressDTO;
         savedAddress.setId(this.faker.number().randomDigit());
-        when(this.addressService.addAddress(taxCode, this.addressDTO)).thenReturn(savedAddress);
+        when(this.addressService.updateAddress(taxCode, this.addressDTO.getId().toString(), this.addressDTO))
+                .thenReturn(savedAddress);
 
         ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
-                .put("/api/v1/addresses/address/{id}customer/{taxCode}", addressDTO.getId(), taxCode)
+                .put("/api/v1/addresses/address/{id}/customer/{taxCode}", addressDTO.getId(), taxCode)
                 .content(this.mapper.writeValueAsString(this.addressDTO))
                 .contentType(MediaType.APPLICATION_JSON));
 
@@ -164,10 +170,11 @@ public class UpdateAddressTest {
         this.addressDTO.setCity(null);
         AddressDTO savedAddress = this.addressDTO;
         savedAddress.setId(this.faker.number().randomDigit());
-        when(this.addressService.addAddress(taxCode, this.addressDTO)).thenReturn(savedAddress);
+        when(this.addressService.updateAddress(taxCode, this.addressDTO.getId().toString(), this.addressDTO))
+                .thenReturn(savedAddress);
 
         ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
-                .put("/api/v1/addresses/address/{id}customer/{taxCode}", addressDTO.getId(), taxCode)
+                .put("/api/v1/addresses/address/{id}/customer/{taxCode}", addressDTO.getId(), taxCode)
                 .content(this.mapper.writeValueAsString(this.addressDTO))
                 .contentType(MediaType.APPLICATION_JSON));
 
@@ -182,10 +189,11 @@ public class UpdateAddressTest {
         this.addressDTO.setCity(this.faker.lorem().sentence(200));
         AddressDTO savedAddress = this.addressDTO;
         savedAddress.setId(this.faker.number().randomDigit());
-        when(this.addressService.addAddress(taxCode, this.addressDTO)).thenReturn(savedAddress);
+        when(this.addressService.updateAddress(taxCode, this.addressDTO.getId().toString(), this.addressDTO))
+                .thenReturn(savedAddress);
 
         ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
-                .put("/api/v1/addresses/address/{id}customer/{taxCode}", addressDTO.getId(), taxCode)
+                .put("/api/v1/addresses/address/{id}/customer/{taxCode}", addressDTO.getId(), taxCode)
                 .content(this.mapper.writeValueAsString(this.addressDTO))
                 .contentType(MediaType.APPLICATION_JSON));
 
@@ -200,10 +208,11 @@ public class UpdateAddressTest {
         this.addressDTO.setStreet(null);
         AddressDTO savedAddress = this.addressDTO;
         savedAddress.setId(this.faker.number().randomDigit());
-        when(this.addressService.addAddress(taxCode, this.addressDTO)).thenReturn(savedAddress);
+        when(this.addressService.updateAddress(taxCode, this.addressDTO.getId().toString(), this.addressDTO))
+                .thenReturn(savedAddress);
 
         ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
-                .put("/api/v1/addresses/address/{id}customer/{taxCode}", addressDTO.getId(), taxCode)
+                .put("/api/v1/addresses/address/{id}/customer/{taxCode}", addressDTO.getId(), taxCode)
                 .content(this.mapper.writeValueAsString(this.addressDTO))
                 .contentType(MediaType.APPLICATION_JSON));
 
@@ -218,10 +227,11 @@ public class UpdateAddressTest {
         this.addressDTO.setStreet(this.faker.lorem().sentence(200));
         AddressDTO savedAddress = this.addressDTO;
         savedAddress.setId(this.faker.number().randomDigit());
-        when(this.addressService.addAddress(taxCode, this.addressDTO)).thenReturn(savedAddress);
+        when(this.addressService.updateAddress(taxCode, this.addressDTO.getId().toString(), this.addressDTO))
+                .thenReturn(savedAddress);
 
         ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
-                .put("/api/v1/addresses/address/{id}customer/{taxCode}", addressDTO.getId(), taxCode)
+                .put("/api/v1/addresses/address/{id}/customer/{taxCode}", addressDTO.getId(), taxCode)
                 .content(this.mapper.writeValueAsString(this.addressDTO))
                 .contentType(MediaType.APPLICATION_JSON));
 
@@ -236,10 +246,11 @@ public class UpdateAddressTest {
         this.addressDTO.setStreetNumber(null);
         AddressDTO savedAddress = this.addressDTO;
         savedAddress.setId(this.faker.number().randomDigit());
-        when(this.addressService.addAddress(taxCode, this.addressDTO)).thenReturn(savedAddress);
+        when(this.addressService.updateAddress(taxCode, this.addressDTO.getId().toString(), this.addressDTO))
+                .thenReturn(savedAddress);
 
         ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
-                .put("/api/v1/addresses/address/{id}customer/{taxCode}", addressDTO.getId(), taxCode)
+                .put("/api/v1/addresses/address/{id}/customer/{taxCode}", addressDTO.getId(), taxCode)
                 .content(this.mapper.writeValueAsString(this.addressDTO))
                 .contentType(MediaType.APPLICATION_JSON));
 
@@ -254,10 +265,11 @@ public class UpdateAddressTest {
         this.addressDTO.setStreetNumber(-1);
         AddressDTO savedAddress = this.addressDTO;
         savedAddress.setId(this.faker.number().randomDigit());
-        when(this.addressService.addAddress(taxCode, this.addressDTO)).thenReturn(savedAddress);
+        when(this.addressService.updateAddress(taxCode, this.addressDTO.getId().toString(), this.addressDTO))
+                .thenReturn(savedAddress);
 
         ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
-                .put("/api/v1/addresses/address/{id}customer/{taxCode}", addressDTO.getId(), taxCode)
+                .put("/api/v1/addresses/address/{id}/customer/{taxCode}", addressDTO.getId(), taxCode)
                 .content(this.mapper.writeValueAsString(this.addressDTO))
                 .contentType(MediaType.APPLICATION_JSON));
 
@@ -272,10 +284,11 @@ public class UpdateAddressTest {
         this.addressDTO.setPostalCode(null);
         AddressDTO savedAddress = this.addressDTO;
         savedAddress.setId(this.faker.number().randomDigit());
-        when(this.addressService.addAddress(taxCode, this.addressDTO)).thenReturn(savedAddress);
+        when(this.addressService.updateAddress(taxCode, this.addressDTO.getId().toString(), this.addressDTO))
+                .thenReturn(savedAddress);
 
         ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
-                .put("/api/v1/addresses/address/{id}customer/{taxCode}", addressDTO.getId(), taxCode)
+                .put("/api/v1/addresses/address/{id}/customer/{taxCode}", addressDTO.getId(), taxCode)
                 .content(this.mapper.writeValueAsString(this.addressDTO))
                 .contentType(MediaType.APPLICATION_JSON));
 
@@ -290,10 +303,11 @@ public class UpdateAddressTest {
         this.addressDTO.setPostalCode(this.faker.lorem().sentence(200));
         AddressDTO savedAddress = this.addressDTO;
         savedAddress.setId(this.faker.number().randomDigit());
-        when(this.addressService.addAddress(taxCode, this.addressDTO)).thenReturn(savedAddress);
+        when(this.addressService.updateAddress(taxCode, this.addressDTO.getId().toString(), this.addressDTO))
+                .thenReturn(savedAddress);
 
         ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
-                .put("/api/v1/addresses/address/{id}customer/{taxCode}", addressDTO.getId(), taxCode)
+                .put("/api/v1/addresses/address/{id}/customer/{taxCode}", addressDTO.getId(), taxCode)
                 .content(this.mapper.writeValueAsString(this.addressDTO))
                 .contentType(MediaType.APPLICATION_JSON));
 
@@ -307,10 +321,11 @@ public class UpdateAddressTest {
         final String taxCode = this.faker.code().isbn10();
         AddressDTO savedAddress = this.addressDTO;
         savedAddress.setId(this.faker.number().randomDigit());
-        when(this.addressService.addAddress(taxCode, this.addressDTO)).thenReturn(savedAddress);
+        when(this.addressService.updateAddress(taxCode, this.addressDTO.getId().toString(), this.addressDTO))
+                .thenReturn(savedAddress);
 
         ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
-                .put("/api/v1/addresses/address/{id}customer/{taxCode}", addressDTO.getId(), taxCode)
+                .put("/api/v1/addresses/address/{id}/customer/{taxCode}", addressDTO.getId(), taxCode)
                 .content(this.mapper.writeValueAsString(this.addressDTO))
                 .contentType(MediaType.APPLICATION_JSON));
 
