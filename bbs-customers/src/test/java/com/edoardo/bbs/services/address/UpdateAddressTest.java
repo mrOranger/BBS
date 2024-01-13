@@ -100,7 +100,10 @@ public class UpdateAddressTest {
         this.customer.getAddresses().add(this.address);
 
         when(this.customerRepository.findById(this.customer.getTaxCode())).thenReturn(Optional.ofNullable(this.customer));
+        when(this.addressRepository.findById(address.getId().toString())).thenReturn(Optional.ofNullable(this.address));
         when(this.addressMapper.convertToDTO(Mockito.any(Address.class))).thenReturn(this.mapToDto(address));
+        when(this.addressMapper.convertToEntity(Mockito.any(AddressDTO.class))).thenReturn(address);
+        when(this.addressRepository.save(address)).thenReturn(this.address);
 
         final AddressDTO address = this.addressService.updateAddress(
                 this.customer.getTaxCode(),
@@ -109,11 +112,17 @@ public class UpdateAddressTest {
         );
 
         assertThat(address).isNotNull();
+        assertThat(address.getStreet()).isEqualTo(this.address.getStreet());
+        assertThat(address.getPostalCode()).isEqualTo(this.address.getPostalCode());
+        assertThat(address.getState()).isEqualTo(this.address.getState());
+        assertThat(address.getCountry()).isEqualTo(this.address.getCountry());
+        assertThat(address.getStreetNumber()).isEqualTo(this.address.getStreetNumber());
     }
 
     private AddressDTO mapToDto(Address address) {
         if (address != null) {
             return AddressDTO.builder()
+                    .id(address.getId())
                     .country(address.getCountry())
                     .state(address.getState())
                     .city(address.getCity())
