@@ -45,7 +45,17 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     public AddressDTO updateAddress(String taxCode, String addressId, AddressDTO address) throws ResourceNotFoundException {
-        return null;
+        final Optional<Customer> customer = this.customerRepository.findById(taxCode);
+        if (customer.isPresent()) {
+            final Customer customerEntity = customer.get();
+            final Optional<Address> foundAddress = this.addressRepository.findById(addressId);
+            if (foundAddress.isPresent()) {
+                address.setId(Integer.parseInt(addressId));
+                return this.addressMapper.convertToDTO(this.addressRepository.save(this.addressMapper.convertToEntity(address)));
+            }
+            throw new ResourceNotFoundException("Address " + addressId + " not found.");
+        }
+        throw new ResourceNotFoundException("Customer " + taxCode + " not found.");
     }
 
     @Override
