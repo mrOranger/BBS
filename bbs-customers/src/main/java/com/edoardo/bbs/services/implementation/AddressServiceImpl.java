@@ -50,6 +50,22 @@ public class AddressServiceImpl implements AddressService {
 
     @Override
     public AddressDTO deleteAddress(String taxCode, String addressId) throws ResourceNotFoundException {
-        return null;
+        final Optional<Customer> customer = this.customerRepository.findById(taxCode);
+        if (customer.isPresent()) {
+            final Customer customerEntity = customer.get();
+            System.out.println(customerEntity.getAddresses());
+            Optional<Address> addressToDelete = customerEntity.getAddresses().stream()
+                    .filter((address -> {
+                        System.out.println(address.getId().toString());
+                        return address.getId().toString().equals(addressId);
+                    }))
+                    .findFirst();
+            if (addressToDelete.isPresent()) {
+                this.addressRepository.delete(addressToDelete.get());
+                return this.addressMapper.convertToDTO(addressToDelete.get());
+            }
+            throw new ResourceNotFoundException("Address " + addressId + " not found.");
+        }
+        throw new ResourceNotFoundException("Customer " + taxCode + " not found.");
     }
 }
