@@ -6,6 +6,7 @@ import com.edoardo.bbs.dtos.AddressDTO;
 import com.edoardo.bbs.dtos.CustomerDTO;
 import com.edoardo.bbs.services.CustomerService;
 import com.github.javafaker.Faker;
+import lombok.SneakyThrows;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -70,27 +71,29 @@ public class FindByFirstNameAndLastNameTest {
         }
     }
 
-    @Test
-    public void testGetAllCustomersByFirstNameAndLastNameReturnsEmptyResponse () throws Exception {
+    @Test @SneakyThrows
+    public void testGetAllCustomersByFirstNameAndLastNameReturnsEmptyResponse () {
         final String firstName = this.faker.name().firstName();
         final String lastName = this.faker.name().lastName();
         when(this.customerService.getCustomersByFirstNameAndLastName(firstName, lastName)).thenReturn(new ArrayList<>());
 
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/customers/firstName/{firstName}/lastName/{lastName}", firstName, lastName)
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
+                .get("/api/v1/customers/firstName/{firstName}/lastName/{lastName}", firstName, lastName)
                 .contentType(MediaType.APPLICATION_JSON));
 
         result.andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.size()", CoreMatchers.is(0)));
     }
 
-    @Test
-    public void testGetAllCustomersByFirstNameAndLastNameReturnsManyCustomers () throws Exception {
+    @Test @SneakyThrows
+    public void testGetAllCustomersByFirstNameAndLastNameReturnsManyCustomers () {
         final String firstName = this.faker.name().firstName();
         final String lastName = this.faker.name().lastName();
         when(this.customerService.getCustomersByFirstNameAndLastName(firstName, lastName)).thenReturn(this.customers);
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/customers/firstName/{firstName}/lastName/{lastName}", firstName, lastName)
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
+                .get("/api/v1/customers/firstName/{firstName}/lastName/{lastName}", firstName, lastName)
                 .contentType(MediaType.APPLICATION_JSON));
 
         result.andExpect(MockMvcResultMatchers.status().isOk())

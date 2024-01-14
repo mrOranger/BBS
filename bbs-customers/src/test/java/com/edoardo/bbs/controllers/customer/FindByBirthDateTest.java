@@ -5,6 +5,7 @@ import com.edoardo.bbs.dtos.AddressDTO;
 import com.edoardo.bbs.dtos.CustomerDTO;
 import com.edoardo.bbs.services.CustomerService;
 import com.github.javafaker.Faker;
+import lombok.SneakyThrows;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -67,25 +68,27 @@ public class FindByBirthDateTest {
         }
     }
 
-    @Test
-    public void testGetAllCustomersByBirthDateReturnsEmptyResponse () throws Exception {
+    @Test @SneakyThrows
+    public void testGetAllCustomersByBirthDateReturnsEmptyResponse () {
         final LocalDate birthDate = this.faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         when(this.customerService.getCustomersByBirthDate(birthDate)).thenReturn(new ArrayList<>());
 
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/customers/birthDate/{birthDate}", birthDate)
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
+                .get("/api/v1/customers/birthDate/{birthDate}", birthDate)
                 .contentType(MediaType.APPLICATION_JSON));
 
         result.andExpect(MockMvcResultMatchers.status().isOk())
                 .andExpect(MockMvcResultMatchers.jsonPath("$.size()", CoreMatchers.is(0)));
     }
 
-    @Test
-    public void testGetAllCustomersByBirthDateReturnsManyCustomers () throws Exception {
+    @Test @SneakyThrows
+    public void testGetAllCustomersByBirthDateReturnsManyCustomers () {
         final LocalDate birthDate = this.faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
         when(this.customerService.getCustomersByBirthDate(birthDate)).thenReturn(this.customers);
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/customers/birthDate/{birthDate}", birthDate)
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
+                .get("/api/v1/customers/birthDate/{birthDate}", birthDate)
                 .contentType(MediaType.APPLICATION_JSON));
 
         result.andExpect(MockMvcResultMatchers.status().isOk())

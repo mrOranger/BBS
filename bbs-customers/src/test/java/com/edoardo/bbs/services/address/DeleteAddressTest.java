@@ -77,14 +77,16 @@ public class DeleteAddressTest {
     public void testDeleteAddressToNotExistingCustomerThrowsException () {
         when(this.customerRepository.findById(this.customer.getTaxCode())).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> this.addressService.addAddress(this.customer.getTaxCode(), this.mapToDto(this.address)));
+        assertThrows(ResourceNotFoundException.class,
+                () -> this.addressService.addAddress(this.customer.getTaxCode(), this.mapToDto(this.address)));
     }
 
     @Test
     public void testDeleteAddressToCustomerWithoutOneResourceNotFoundException () {
         when(this.customerRepository.findById(this.customer.getTaxCode())).thenReturn(Optional.ofNullable(this.customer));
 
-        assertThrows(ResourceNotFoundException.class, () -> this.addressService.deleteAddress(this.customer.getTaxCode(), this.address.getId().toString()));
+        assertThrows(ResourceNotFoundException.class,
+                () -> this.addressService.deleteAddress(this.customer.getTaxCode(), this.address.getId().toString()));
     }
 
     @Test @SneakyThrows

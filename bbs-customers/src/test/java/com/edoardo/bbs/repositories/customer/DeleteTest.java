@@ -4,6 +4,7 @@ import com.edoardo.bbs.entities.Address;
 import com.edoardo.bbs.entities.Customer;
 import com.edoardo.bbs.repositories.CustomerRepository;
 import com.github.javafaker.Faker;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.jdbc.EmbeddedDatabaseConnection;
@@ -21,8 +22,9 @@ import static org.assertj.core.api.Assertions.assertThat;
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
 public class DeleteTest {
 
+    private Address address;
     private final Faker faker;
-
+    private Customer customer;
     private final CustomerRepository customerRepository;
 
 
@@ -32,9 +34,9 @@ public class DeleteTest {
         this.faker = new Faker();
     }
 
-    @Test
-    public void deleteCustomerWithoutAddress () {
-        final Customer newCustomer = Customer.builder().taxCode(this.faker.code().isbn10())
+    @BeforeEach
+    public void init () {
+        this.customer = Customer.builder().taxCode(this.faker.code().isbn10())
                 .firstName(this.faker.name().firstName())
                 .lastName(this.faker.name().lastName())
                 .birthDate(this.faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
@@ -45,40 +47,33 @@ public class DeleteTest {
                 .addresses(new HashSet<>())
                 .build();
 
-        this.customerRepository.save(newCustomer);
-        this.customerRepository.delete(newCustomer);
-
-        final Optional<Customer> customer = this.customerRepository.findById(newCustomer.getTaxCode());
-
-        assertThat(customer.isPresent()).isEqualTo(false);
-    }
-
-    @Test
-    public void deleteCustomerWithAddress () {
-        final Address address = Address.builder().country(this.faker.address().country())
+        this.address = Address.builder().country(this.faker.address().country())
                 .state(this.faker.address().state())
                 .city(this.faker.address().city())
                 .street(this.faker.address().city())
                 .streetNumber(Integer.parseInt(this.faker.address().streetAddressNumber()))
                 .postalCode(this.faker.address().zipCode())
                 .build();
-        final Customer newCustomer = Customer.builder().taxCode(this.faker.code().isbn10())
-                .firstName(this.faker.name().firstName())
-                .lastName(this.faker.name().lastName())
-                .birthDate(this.faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
-                .email(this.faker.internet().emailAddress())
-                .emailVerifiedAt(this.faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
-                .password(this.faker.internet().password())
-                .idCard(this.faker.file().toString())
-                .addresses(new HashSet<>())
-                .build();
+    }
 
-        address.setCustomer(newCustomer);
-        newCustomer.getAddresses().add(address);
-        this.customerRepository.save(newCustomer);
-        this.customerRepository.delete(newCustomer);
+    @Test
+    public void deleteCustomerWithoutAddress () {
+        this.customerRepository.save(this.customer);
+        this.customerRepository.delete(this.customer);
 
-        final Optional<Customer> customer = this.customerRepository.findById(newCustomer.getTaxCode());
+        final Optional<Customer> customer = this.customerRepository.findById(this.customer.getTaxCode());
+
+        assertThat(customer.isPresent()).isEqualTo(false);
+    }
+
+    @Test
+    public void deleteCustomerWithAddress () {
+        address.setCustomer(this.customer);
+        this.customer.getAddresses().add(address);
+        this.customerRepository.save(this.customer);
+        this.customerRepository.delete(this.customer);
+
+        final Optional<Customer> customer = this.customerRepository.findById(this.customer.getTaxCode());
 
         assertThat(customer.isPresent()).isEqualTo(false);
     }

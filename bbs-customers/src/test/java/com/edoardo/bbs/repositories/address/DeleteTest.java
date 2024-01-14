@@ -16,6 +16,9 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import java.time.ZoneId;
 import java.util.Optional;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 
 @DataJpaTest
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
@@ -60,13 +63,22 @@ public class DeleteTest {
         this.address.setCustomer(this.customer);
         this.customerRepository.save(this.customer);
         this.addressRepository.save(this.address);
-
         this.addressRepository.delete(this.address);
 
         final Optional<Customer> updatedCustomer = this.customerRepository.findById(this.customer.getTaxCode());
         final Optional<Address> updatedAddress = this.addressRepository.findById(this.address.getId().toString());
-        Assertions.assertTrue(updatedAddress.isEmpty());
-        Assertions.assertEquals(updatedCustomer.get().getTaxCode(), this.customer.getTaxCode());
-        Assertions.assertNull(updatedCustomer.get().getAddresses());
+
+        assertAll(
+                () -> Assertions.assertTrue(updatedAddress.isEmpty()),
+                () -> Assertions.assertEquals(updatedCustomer.get().getTaxCode(), this.customer.getTaxCode()),
+                () -> Assertions.assertEquals(updatedCustomer.get().getFirstName(), this.customer.getFirstName()),
+                () -> Assertions.assertEquals(updatedCustomer.get().getLastName(), this.customer.getLastName()),
+                () -> Assertions.assertEquals(updatedCustomer.get().getBirthDate(), this.customer.getBirthDate()),
+                () -> Assertions.assertEquals(updatedCustomer.get().getEmail(), this.customer.getEmail()),
+                () -> Assertions.assertEquals(updatedCustomer.get().getEmailVerifiedAt(), this.customer.getEmailVerifiedAt()),
+                () -> Assertions.assertEquals(updatedCustomer.get().getPassword(), this.customer.getPassword()),
+                () -> Assertions.assertEquals(updatedCustomer.get().getIdCard(), this.customer.getIdCard()),
+                () -> Assertions.assertNull(updatedCustomer.get().getAddresses())
+        );
     }
 }

@@ -8,6 +8,7 @@ import com.edoardo.bbs.exceptions.ResourceNotFoundException;
 import com.edoardo.bbs.services.AddressService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.javafaker.Faker;
+import lombok.SneakyThrows;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -57,246 +58,277 @@ public class AddAddressTest {
                 .build();
     }
 
-    @Test
-    public void testAddAddressToNotExistingCustomerReturnsNotFound () throws Exception {
+    @Test @SneakyThrows
+    public void testAddAddressToNotExistingCustomerReturnsNotFound () {
         final String taxCode = this.faker.code().isbn10();
-        when(this.addressService.addAddress(taxCode, this.addressDTO)).thenThrow(new ResourceNotFoundException("Customer " + taxCode + " not found."));
+        final String errorMessage = "Customer " + taxCode + " not found.";
+        when(this.addressService.addAddress(taxCode, this.addressDTO))
+                .thenThrow(new ResourceNotFoundException(errorMessage));
 
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.patch("/api/v1/addresses/customer/{taxCode}", taxCode)
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
+                .patch("/api/v1/addresses/customer/{taxCode}", taxCode)
                 .content(this.mapper.writeValueAsString(this.addressDTO))
                 .contentType(MediaType.APPLICATION_JSON));
 
         result.andExpect(MockMvcResultMatchers.status().isNotFound())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Customer " + taxCode + " not found.")));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is(errorMessage)));
     }
 
-    @Test
-    public void testAddAddressToCustomerWithAlreadyThreeAddressReturnsBadRequest () throws Exception{
+    @Test @SneakyThrows
+    public void testAddAddressToCustomerWithAlreadyThreeAddressReturnsBadRequest () {
         final String taxCode = this.faker.code().isbn10();
-        when(this.addressService.addAddress(taxCode, this.addressDTO)).thenThrow(new MaximumAddressNumberException("Maximum number of addresses."));
+        final String errorMessage = "Maximum number of addresses.";
+        when(this.addressService.addAddress(taxCode, this.addressDTO))
+                .thenThrow(new MaximumAddressNumberException(errorMessage));
 
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.patch("/api/v1/addresses/customer/{taxCode}", taxCode)
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
+                .patch("/api/v1/addresses/customer/{taxCode}", taxCode)
                 .content(this.mapper.writeValueAsString(this.addressDTO))
                 .contentType(MediaType.APPLICATION_JSON));
 
         result.andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Maximum number of addresses.")));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is(errorMessage)));
     }
 
-    @Test
-    public void testAddAddressToCustomerWithoutCountryReturnsBadRequest () throws Exception {
+    @Test @SneakyThrows
+    public void testAddAddressToCustomerWithoutCountryReturnsBadRequest () {
         final String taxCode = this.faker.code().isbn10();
+        final String errorMessage = "Address country must be not empty.";
         this.addressDTO.setCountry(null);
         AddressDTO savedAddress = this.addressDTO;
         savedAddress.setId(this.faker.number().randomDigit());
         when(this.addressService.addAddress(taxCode, this.addressDTO)).thenReturn(savedAddress);
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.patch("/api/v1/addresses/customer/{taxCode}", taxCode)
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
+                .patch("/api/v1/addresses/customer/{taxCode}", taxCode)
                 .content(this.mapper.writeValueAsString(this.addressDTO))
                 .contentType(MediaType.APPLICATION_JSON));
 
         result.andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Address country must be not empty.")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is(errorMessage)))
                 .andDo(MockMvcResultHandlers.print());
     }
 
-    @Test
-    public void testAddAddressToCustomerWithInvalidCountryReturnsBadRequest () throws Exception {
+    @Test @SneakyThrows
+    public void testAddAddressToCustomerWithInvalidCountryReturnsBadRequest () {
         final String taxCode = this.faker.code().isbn10();
+        final String errorMessage = "Address country must be at most 100 character long.";
         this.addressDTO.setCountry(this.faker.lorem().sentence(200));
         AddressDTO savedAddress = this.addressDTO;
         savedAddress.setId(this.faker.number().randomDigit());
         when(this.addressService.addAddress(taxCode, this.addressDTO)).thenReturn(savedAddress);
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.patch("/api/v1/addresses/customer/{taxCode}", taxCode)
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
+                .patch("/api/v1/addresses/customer/{taxCode}", taxCode)
                 .content(this.mapper.writeValueAsString(this.addressDTO))
                 .contentType(MediaType.APPLICATION_JSON));
 
         result.andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Address country must be at most 100 character long.")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is(errorMessage)))
                 .andDo(MockMvcResultHandlers.print());
     }
 
-    @Test
-    public void testAddAddressToCustomerWithoutStateReturnsBadRequest () throws Exception {
+    @Test @SneakyThrows
+    public void testAddAddressToCustomerWithoutStateReturnsBadRequest () {
         final String taxCode = this.faker.code().isbn10();
+        final String errorMessage = "Address state must be not empty.";
         this.addressDTO.setState(null);
         AddressDTO savedAddress = this.addressDTO;
         savedAddress.setId(this.faker.number().randomDigit());
         when(this.addressService.addAddress(taxCode, this.addressDTO)).thenReturn(savedAddress);
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.patch("/api/v1/addresses/customer/{taxCode}", taxCode)
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
+                .patch("/api/v1/addresses/customer/{taxCode}", taxCode)
                 .content(this.mapper.writeValueAsString(this.addressDTO))
                 .contentType(MediaType.APPLICATION_JSON));
 
         result.andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Address state must be not empty.")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is(errorMessage)))
                 .andDo(MockMvcResultHandlers.print());
     }
 
-    @Test
-    public void testAddAddressToCustomerWithInvalidStateReturnsBadRequest () throws Exception {
+    @Test @SneakyThrows
+    public void testAddAddressToCustomerWithInvalidStateReturnsBadRequest () {
         final String taxCode = this.faker.code().isbn10();
+        final String errorMessage = "Address state must be at most 100 character long.";
         this.addressDTO.setState(this.faker.lorem().sentence(200));
         AddressDTO savedAddress = this.addressDTO;
         savedAddress.setId(this.faker.number().randomDigit());
         when(this.addressService.addAddress(taxCode, this.addressDTO)).thenReturn(savedAddress);
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.patch("/api/v1/addresses/customer/{taxCode}", taxCode)
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
+                .patch("/api/v1/addresses/customer/{taxCode}", taxCode)
                 .content(this.mapper.writeValueAsString(this.addressDTO))
                 .contentType(MediaType.APPLICATION_JSON));
 
         result.andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Address state must be at most 100 character long.")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is(errorMessage)))
                 .andDo(MockMvcResultHandlers.print());
     }
 
-    @Test
-    public void testAddAddressToCustomerWithoutCityReturnsBadRequest () throws Exception {
+    @Test @SneakyThrows
+    public void testAddAddressToCustomerWithoutCityReturnsBadRequest () {
         final String taxCode = this.faker.code().isbn10();
+        final String errorMessage = "Address city must be not empty.";
         this.addressDTO.setCity(null);
         AddressDTO savedAddress = this.addressDTO;
         savedAddress.setId(this.faker.number().randomDigit());
         when(this.addressService.addAddress(taxCode, this.addressDTO)).thenReturn(savedAddress);
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.patch("/api/v1/addresses/customer/{taxCode}", taxCode)
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
+                .patch("/api/v1/addresses/customer/{taxCode}", taxCode)
                 .content(this.mapper.writeValueAsString(this.addressDTO))
                 .contentType(MediaType.APPLICATION_JSON));
 
         result.andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Address city must be not empty.")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is(errorMessage)))
                 .andDo(MockMvcResultHandlers.print());
     }
 
-    @Test
-    public void testAddAddressToCustomerWithInvalidCityReturnsBadRequest () throws Exception {
+    @Test @SneakyThrows
+    public void testAddAddressToCustomerWithInvalidCityReturnsBadRequest () {
         final String taxCode = this.faker.code().isbn10();
+        final String errorMessage = "Address city must be at most 100 character long.";
         this.addressDTO.setCity(this.faker.lorem().sentence(200));
         AddressDTO savedAddress = this.addressDTO;
         savedAddress.setId(this.faker.number().randomDigit());
         when(this.addressService.addAddress(taxCode, this.addressDTO)).thenReturn(savedAddress);
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.patch("/api/v1/addresses/customer/{taxCode}", taxCode)
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
+                .patch("/api/v1/addresses/customer/{taxCode}", taxCode)
                 .content(this.mapper.writeValueAsString(this.addressDTO))
                 .contentType(MediaType.APPLICATION_JSON));
 
         result.andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Address city must be at most 100 character long.")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is(errorMessage)))
                 .andDo(MockMvcResultHandlers.print());
     }
 
-    @Test
-    public void testAddAddressToCustomerWithoutStreetReturnsBadRequest () throws Exception {
+    @Test @SneakyThrows
+    public void testAddAddressToCustomerWithoutStreetReturnsBadRequest () {
         final String taxCode = this.faker.code().isbn10();
+        final String errorMessage = "Address street must be not empty.";
         this.addressDTO.setStreet(null);
         AddressDTO savedAddress = this.addressDTO;
         savedAddress.setId(this.faker.number().randomDigit());
         when(this.addressService.addAddress(taxCode, this.addressDTO)).thenReturn(savedAddress);
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.patch("/api/v1/addresses/customer/{taxCode}", taxCode)
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
+                .patch("/api/v1/addresses/customer/{taxCode}", taxCode)
                 .content(this.mapper.writeValueAsString(this.addressDTO))
                 .contentType(MediaType.APPLICATION_JSON));
 
         result.andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Address street must be not empty.")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is(errorMessage)))
                 .andDo(MockMvcResultHandlers.print());
     }
 
-    @Test
-    public void testAddAddressToCustomerWithInvalidStreetReturnsBadRequest () throws Exception {
+    @Test @SneakyThrows
+    public void testAddAddressToCustomerWithInvalidStreetReturnsBadRequest () {
         final String taxCode = this.faker.code().isbn10();
+        final String errorMessage = "Address street must be at most 100 character long.";
         this.addressDTO.setStreet(this.faker.lorem().sentence(200));
         AddressDTO savedAddress = this.addressDTO;
         savedAddress.setId(this.faker.number().randomDigit());
         when(this.addressService.addAddress(taxCode, this.addressDTO)).thenReturn(savedAddress);
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.patch("/api/v1/addresses/customer/{taxCode}", taxCode)
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
+                .patch("/api/v1/addresses/customer/{taxCode}", taxCode)
                 .content(this.mapper.writeValueAsString(this.addressDTO))
                 .contentType(MediaType.APPLICATION_JSON));
 
         result.andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Address street must be at most 100 character long.")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is(errorMessage)))
                 .andDo(MockMvcResultHandlers.print());
     }
 
-    @Test
-    public void testAddAddressToCustomerWithoutStreetNumberReturnsBadRequest () throws Exception {
+    @Test @SneakyThrows
+    public void testAddAddressToCustomerWithoutStreetNumberReturnsBadRequest () {
         final String taxCode = this.faker.code().isbn10();
+        final String errorMessage = "Address street number must be not empty.";
         this.addressDTO.setStreetNumber(null);
         AddressDTO savedAddress = this.addressDTO;
         savedAddress.setId(this.faker.number().randomDigit());
         when(this.addressService.addAddress(taxCode, this.addressDTO)).thenReturn(savedAddress);
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.patch("/api/v1/addresses/customer/{taxCode}", taxCode)
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
+                .patch("/api/v1/addresses/customer/{taxCode}", taxCode)
                 .content(this.mapper.writeValueAsString(this.addressDTO))
                 .contentType(MediaType.APPLICATION_JSON));
 
         result.andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Address street number must be not empty.")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is(errorMessage)))
                 .andDo(MockMvcResultHandlers.print());
     }
 
-    @Test
-    public void testAddAddressToCustomerWithInvalidStreetNumberReturnsBadRequest () throws Exception {
+    @Test @SneakyThrows
+    public void testAddAddressToCustomerWithInvalidStreetNumberReturnsBadRequest () {
         final String taxCode = this.faker.code().isbn10();
+        final String errorMessage = "Address street number must be greater than or equal to 1.";
         this.addressDTO.setStreetNumber(-1);
         AddressDTO savedAddress = this.addressDTO;
         savedAddress.setId(this.faker.number().randomDigit());
         when(this.addressService.addAddress(taxCode, this.addressDTO)).thenReturn(savedAddress);
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.patch("/api/v1/addresses/customer/{taxCode}", taxCode)
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
+                .patch("/api/v1/addresses/customer/{taxCode}", taxCode)
                 .content(this.mapper.writeValueAsString(this.addressDTO))
                 .contentType(MediaType.APPLICATION_JSON));
 
         result.andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Address street number must be greater than or equal to 1.")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is(errorMessage)))
                 .andDo(MockMvcResultHandlers.print());
     }
 
-    @Test
-    public void testAddAddressToCustomerWithoutPostalCodeReturnsBadRequest () throws Exception {
+    @Test @SneakyThrows
+    public void testAddAddressToCustomerWithoutPostalCodeReturnsBadRequest () {
         final String taxCode = this.faker.code().isbn10();
+        final String errorMessage = "Address postal code must be not empty.";
         this.addressDTO.setPostalCode(null);
         AddressDTO savedAddress = this.addressDTO;
         savedAddress.setId(this.faker.number().randomDigit());
         when(this.addressService.addAddress(taxCode, this.addressDTO)).thenReturn(savedAddress);
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.patch("/api/v1/addresses/customer/{taxCode}", taxCode)
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
+                .patch("/api/v1/addresses/customer/{taxCode}", taxCode)
                 .content(this.mapper.writeValueAsString(this.addressDTO))
                 .contentType(MediaType.APPLICATION_JSON));
 
         result.andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Address postal code must be not empty.")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is(errorMessage)))
                 .andDo(MockMvcResultHandlers.print());
     }
 
-    @Test
-    public void testAddAddressToCustomerWithInvalidPostalCodeNumberReturnsBadRequest () throws Exception {
+    @Test @SneakyThrows
+    public void testAddAddressToCustomerWithInvalidPostalCodeNumberReturnsBadRequest () {
         final String taxCode = this.faker.code().isbn10();
+        final String errorMessage = "Address postal code must be at most 50 character long.";
         this.addressDTO.setPostalCode(this.faker.lorem().sentence(200));
         AddressDTO savedAddress = this.addressDTO;
         savedAddress.setId(this.faker.number().randomDigit());
         when(this.addressService.addAddress(taxCode, this.addressDTO)).thenReturn(savedAddress);
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.patch("/api/v1/addresses/customer/{taxCode}", taxCode)
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
+                .patch("/api/v1/addresses/customer/{taxCode}", taxCode)
                 .content(this.mapper.writeValueAsString(this.addressDTO))
                 .contentType(MediaType.APPLICATION_JSON));
 
         result.andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Address postal code must be at most 50 character long.")))
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is(errorMessage)))
                 .andDo(MockMvcResultHandlers.print());
     }
 
-    @Test
-    public void testAddAddressToCustomerReturnsOkay () throws Exception {
+    @Test @SneakyThrows
+    public void testAddAddressToCustomerReturnsOkay () {
         final String taxCode = this.faker.code().isbn10();
         AddressDTO savedAddress = this.addressDTO;
         savedAddress.setId(this.faker.number().randomDigit());
         when(this.addressService.addAddress(taxCode, this.addressDTO)).thenReturn(savedAddress);
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.patch("/api/v1/addresses/customer/{taxCode}", taxCode)
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
+                .patch("/api/v1/addresses/customer/{taxCode}", taxCode)
                 .content(this.mapper.writeValueAsString(this.addressDTO))
                 .contentType(MediaType.APPLICATION_JSON));
 

@@ -7,6 +7,7 @@ import com.edoardo.bbs.exceptions.ResourceNotFoundException;
 import com.edoardo.bbs.services.AddressService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.javafaker.Faker;
+import lombok.SneakyThrows;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -56,8 +57,8 @@ public class UpdateAddressTest {
                 .build();
     }
 
-    @Test
-    public void testUpdateNotExistingAddressReturnsNotFound () throws Exception {
+    @Test @SneakyThrows
+    public void testUpdateNotExistingAddressReturnsNotFound () {
         final String taxCode = this.faker.code().isbn10();
         final String address = Integer.toString(this.faker.number().randomDigit());
         when(this.addressService.updateAddress(taxCode, address, addressDTO))
@@ -69,11 +70,12 @@ public class UpdateAddressTest {
                 .contentType(MediaType.APPLICATION_JSON));
 
         result.andExpect(MockMvcResultMatchers.status().isNotFound())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Address " + address + " not found.")));
+                .andExpect(MockMvcResultMatchers
+                        .jsonPath("$.message", CoreMatchers.is("Address " + address + " not found.")));
     }
 
-    @Test
-    public void testUpdateAddressWithNotExistingCustomerReturnsNotFound () throws Exception {
+    @Test @SneakyThrows
+    public void testUpdateAddressWithNotExistingCustomerReturnsNotFound () {
         final String taxCode = this.faker.code().isbn10();
         final String addressId = Integer.toString(this.faker.number().randomDigit());
         when(this.addressService.updateAddress(taxCode, addressId, this.addressDTO))
@@ -85,11 +87,12 @@ public class UpdateAddressTest {
                 .contentType(MediaType.APPLICATION_JSON));
 
         result.andExpect(MockMvcResultMatchers.status().isNotFound())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Customer " + taxCode + " not found.")));
+                .andExpect(MockMvcResultMatchers
+                        .jsonPath("$.message", CoreMatchers.is("Customer " + taxCode + " not found.")));
     }
 
-    @Test
-    public void testUpdateAddressToCustomerWithoutCountryReturnsBadRequest () throws Exception {
+    @Test @SneakyThrows
+    public void testUpdateAddressToCustomerWithoutCountryReturnsBadRequest () {
         final String taxCode = this.faker.code().isbn10();
         this.addressDTO.setCountry(null);
         AddressDTO savedAddress = this.addressDTO;
@@ -103,12 +106,13 @@ public class UpdateAddressTest {
                 .contentType(MediaType.APPLICATION_JSON));
 
         result.andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Address country must be not empty.")))
+                .andExpect(MockMvcResultMatchers
+                        .jsonPath("$.message", CoreMatchers.is("Address country must be not empty.")))
                 .andDo(MockMvcResultHandlers.print());
     }
 
-    @Test
-    public void testUpdateAddressToCustomerWithInvalidCountryReturnsBadRequest () throws Exception {
+    @Test @SneakyThrows
+    public void testUpdateAddressToCustomerWithInvalidCountryReturnsBadRequest () {
         final String taxCode = this.faker.code().isbn10();
         this.addressDTO.setCountry(this.faker.lorem().sentence(200));
         AddressDTO savedAddress = this.addressDTO;
@@ -122,12 +126,13 @@ public class UpdateAddressTest {
                 .contentType(MediaType.APPLICATION_JSON));
 
         result.andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Address country must be at most 100 character long.")))
+                .andExpect(MockMvcResultMatchers
+                        .jsonPath("$.message", CoreMatchers.is("Address country must be at most 100 character long.")))
                 .andDo(MockMvcResultHandlers.print());
     }
 
-    @Test
-    public void testUpdateAddressToCustomerWithoutStateReturnsBadRequest () throws Exception {
+    @Test @SneakyThrows
+    public void testUpdateAddressToCustomerWithoutStateReturnsBadRequest () {
         final String taxCode = this.faker.code().isbn10();
         this.addressDTO.setState(null);
         AddressDTO savedAddress = this.addressDTO;
@@ -141,12 +146,13 @@ public class UpdateAddressTest {
                 .contentType(MediaType.APPLICATION_JSON));
 
         result.andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Address state must be not empty.")))
+                .andExpect(MockMvcResultMatchers
+                        .jsonPath("$.message", CoreMatchers.is("Address state must be not empty.")))
                 .andDo(MockMvcResultHandlers.print());
     }
 
-    @Test
-    public void testUpdateAddressToCustomerWithInvalidStateReturnsBadRequest () throws Exception {
+    @Test @SneakyThrows
+    public void testUpdateAddressToCustomerWithInvalidStateReturnsBadRequest () {
         final String taxCode = this.faker.code().isbn10();
         this.addressDTO.setState(this.faker.lorem().sentence(200));
         AddressDTO savedAddress = this.addressDTO;
@@ -160,12 +166,13 @@ public class UpdateAddressTest {
                 .contentType(MediaType.APPLICATION_JSON));
 
         result.andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Address state must be at most 100 character long.")))
+                .andExpect(MockMvcResultMatchers
+                        .jsonPath("$.message", CoreMatchers.is("Address state must be at most 100 character long.")))
                 .andDo(MockMvcResultHandlers.print());
     }
 
-    @Test
-    public void testUpdateAddressToCustomerWithoutCityReturnsBadRequest () throws Exception {
+    @Test @SneakyThrows
+    public void testUpdateAddressToCustomerWithoutCityReturnsBadRequest () {
         final String taxCode = this.faker.code().isbn10();
         this.addressDTO.setCity(null);
         AddressDTO savedAddress = this.addressDTO;
@@ -179,12 +186,13 @@ public class UpdateAddressTest {
                 .contentType(MediaType.APPLICATION_JSON));
 
         result.andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Address city must be not empty.")))
+                .andExpect(MockMvcResultMatchers
+                        .jsonPath("$.message", CoreMatchers.is("Address city must be not empty.")))
                 .andDo(MockMvcResultHandlers.print());
     }
 
-    @Test
-    public void testUpdateAddressToCustomerWithInvalidCityReturnsBadRequest () throws Exception {
+    @Test @SneakyThrows
+    public void testUpdateAddressToCustomerWithInvalidCityReturnsBadRequest () {
         final String taxCode = this.faker.code().isbn10();
         this.addressDTO.setCity(this.faker.lorem().sentence(200));
         AddressDTO savedAddress = this.addressDTO;
@@ -202,8 +210,8 @@ public class UpdateAddressTest {
                 .andDo(MockMvcResultHandlers.print());
     }
 
-    @Test
-    public void testUpdateAddressToCustomerWithoutStreetReturnsBadRequest () throws Exception {
+    @Test @SneakyThrows
+    public void testUpdateAddressToCustomerWithoutStreetReturnsBadRequest () {
         final String taxCode = this.faker.code().isbn10();
         this.addressDTO.setStreet(null);
         AddressDTO savedAddress = this.addressDTO;
@@ -221,8 +229,8 @@ public class UpdateAddressTest {
                 .andDo(MockMvcResultHandlers.print());
     }
 
-    @Test
-    public void testUpdateAddressToCustomerWithInvalidStreetReturnsBadRequest () throws Exception {
+    @Test @SneakyThrows
+    public void testUpdateAddressToCustomerWithInvalidStreetReturnsBadRequest () {
         final String taxCode = this.faker.code().isbn10();
         this.addressDTO.setStreet(this.faker.lorem().sentence(200));
         AddressDTO savedAddress = this.addressDTO;
@@ -240,8 +248,8 @@ public class UpdateAddressTest {
                 .andDo(MockMvcResultHandlers.print());
     }
 
-    @Test
-    public void testUpdateAddressToCustomerWithoutStreetNumberReturnsBadRequest () throws Exception {
+    @Test @SneakyThrows
+    public void testUpdateAddressToCustomerWithoutStreetNumberReturnsBadRequest () {
         final String taxCode = this.faker.code().isbn10();
         this.addressDTO.setStreetNumber(null);
         AddressDTO savedAddress = this.addressDTO;
@@ -259,8 +267,8 @@ public class UpdateAddressTest {
                 .andDo(MockMvcResultHandlers.print());
     }
 
-    @Test
-    public void testUpdateAddressToCustomerWithInvalidStreetNumberReturnsBadRequest () throws Exception {
+    @Test @SneakyThrows
+    public void testUpdateAddressToCustomerWithInvalidStreetNumberReturnsBadRequest () {
         final String taxCode = this.faker.code().isbn10();
         this.addressDTO.setStreetNumber(-1);
         AddressDTO savedAddress = this.addressDTO;
@@ -278,8 +286,8 @@ public class UpdateAddressTest {
                 .andDo(MockMvcResultHandlers.print());
     }
 
-    @Test
-    public void testUpdateAddressToCustomerWithoutPostalCodeReturnsBadRequest () throws Exception {
+    @Test @SneakyThrows
+    public void testUpdateAddressToCustomerWithoutPostalCodeReturnsBadRequest () {
         final String taxCode = this.faker.code().isbn10();
         this.addressDTO.setPostalCode(null);
         AddressDTO savedAddress = this.addressDTO;
@@ -297,8 +305,8 @@ public class UpdateAddressTest {
                 .andDo(MockMvcResultHandlers.print());
     }
 
-    @Test
-    public void testUpdateAddressToCustomerWithInvalidPostalCodeNumberReturnsBadRequest () throws Exception {
+    @Test @SneakyThrows
+    public void testUpdateAddressToCustomerWithInvalidPostalCodeNumberReturnsBadRequest () {
         final String taxCode = this.faker.code().isbn10();
         this.addressDTO.setPostalCode(this.faker.lorem().sentence(200));
         AddressDTO savedAddress = this.addressDTO;
@@ -316,8 +324,8 @@ public class UpdateAddressTest {
                 .andDo(MockMvcResultHandlers.print());
     }
 
-    @Test
-    public void testUpdateAddressToCustomerReturnsOkay () throws Exception {
+    @Test @SneakyThrows
+    public void testUpdateAddressToCustomerReturnsOkay () {
         final String taxCode = this.faker.code().isbn10();
         AddressDTO savedAddress = this.addressDTO;
         savedAddress.setId(this.faker.number().randomDigit());

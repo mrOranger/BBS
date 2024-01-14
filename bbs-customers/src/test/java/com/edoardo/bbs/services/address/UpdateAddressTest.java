@@ -99,7 +99,7 @@ public class UpdateAddressTest {
     }
 
     @Test
-    public void testUpdateAddressToCustomerWithOneReturnsAddress () throws ResourceNotFoundException {
+    public void testUpdateAddressToCustomerWithOneReturnsAddress () {
         this.customer.getAddresses().add(this.address);
 
         when(this.customerRepository.findById(this.customer.getTaxCode())).thenReturn(Optional.ofNullable(this.customer));

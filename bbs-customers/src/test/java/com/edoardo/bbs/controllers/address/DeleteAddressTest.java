@@ -62,8 +62,9 @@ public class DeleteAddressTest {
     public void testDeleteNotExistingAddressReturnsNotFound () {
         final String taxCode = this.faker.code().isbn10();
         final String address = Integer.toString(this.faker.number().randomDigit());
+        final String errorMessage = "Address " + address + " not found.";
         when(this.addressService.deleteAddress(taxCode, address))
-                .thenThrow(new ResourceNotFoundException("Address " + address + " not found."));
+                .thenThrow(new ResourceNotFoundException(errorMessage));
 
         ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
                 .delete("/api/v1/addresses/address/{id}/customer/{taxCode}", address, taxCode)
@@ -71,15 +72,16 @@ public class DeleteAddressTest {
                 .contentType(MediaType.APPLICATION_JSON));
 
         result.andExpect(MockMvcResultMatchers.status().isNotFound())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Address " + address + " not found.")));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is(errorMessage)));
     }
 
     @Test @SneakyThrows
     public void testDeleteAddressOfNotExistingCustomerReturnsNotFound () {
         final String taxCode = this.faker.code().isbn10();
         final String address = Integer.toString(this.faker.number().randomDigit());
+        final String errorMessage = "Customer " + taxCode + " not found.";
         when(this.addressService.deleteAddress(taxCode, address))
-                .thenThrow(new ResourceNotFoundException("Customer " + taxCode + " not found."));
+                .thenThrow(new ResourceNotFoundException(errorMessage));
 
         ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
                 .delete("/api/v1/addresses/address/{id}/customer/{taxCode}", address, taxCode)
@@ -87,7 +89,7 @@ public class DeleteAddressTest {
                 .contentType(MediaType.APPLICATION_JSON));
 
         result.andExpect(MockMvcResultMatchers.status().isNotFound())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Customer " + taxCode + " not found.")));
+                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is(errorMessage)));
     }
 
     @Test @SneakyThrows

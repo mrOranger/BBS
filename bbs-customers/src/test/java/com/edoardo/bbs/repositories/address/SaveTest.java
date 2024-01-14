@@ -16,6 +16,8 @@ import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import java.time.ZoneId;
 
+import static org.junit.jupiter.api.Assertions.assertAll;
+
 @DataJpaTest
 @AutoConfigureTestDatabase(connection = EmbeddedDatabaseConnection.H2)
 public class SaveTest {
@@ -61,15 +63,17 @@ public class SaveTest {
         this.customerRepository.save(this.customer);
         final Address updatedAddress = this.addressRepository.save(this.address);
 
-        Assertions.assertEquals(updatedAddress.getCountry(), this.address.getCountry());
-        Assertions.assertEquals(updatedAddress.getState(), this.address.getState());
-        Assertions.assertEquals(updatedAddress.getCity(), this.address.getCity());
-        Assertions.assertEquals(updatedAddress.getStreet(), this.address.getStreet());
-        Assertions.assertEquals(updatedAddress.getStreetNumber(), this.address.getStreetNumber());
-        Assertions.assertEquals(updatedAddress.getCustomer().getTaxCode(), this.customer.getTaxCode());
-        Assertions.assertEquals(updatedAddress.getCustomer().getFirstName(), this.customer.getFirstName());
-        Assertions.assertEquals(updatedAddress.getCustomer().getLastName(), this.customer.getLastName());
-        Assertions.assertEquals(updatedAddress.getCustomer().getBirthDate(), this.customer.getBirthDate());
-        Assertions.assertEquals(updatedAddress.getCustomer().getEmail(), this.customer.getEmail());
+        assertAll(
+                () -> Assertions.assertEquals(updatedAddress.getCountry(), this.address.getCountry()),
+                () -> Assertions.assertEquals(updatedAddress.getState(), this.address.getState()),
+                () -> Assertions.assertEquals(updatedAddress.getCity(), this.address.getCity()),
+                () -> Assertions.assertEquals(updatedAddress.getStreet(), this.address.getStreet()),
+                () -> Assertions.assertEquals(updatedAddress.getStreetNumber(), this.address.getStreetNumber()),
+                () -> Assertions.assertEquals(updatedAddress.getCustomer().getTaxCode(), this.customer.getTaxCode()),
+                () -> Assertions.assertEquals(updatedAddress.getCustomer().getFirstName(), this.customer.getFirstName()),
+                () -> Assertions.assertEquals(updatedAddress.getCustomer().getLastName(), this.customer.getLastName()),
+                () -> Assertions.assertEquals(updatedAddress.getCustomer().getBirthDate(), this.customer.getBirthDate()),
+                () -> Assertions.assertEquals(updatedAddress.getCustomer().getEmail(), this.customer.getEmail())
+        );
     }
 }

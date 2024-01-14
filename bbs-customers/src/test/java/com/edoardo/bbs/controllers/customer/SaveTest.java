@@ -7,6 +7,7 @@ import com.edoardo.bbs.exceptions.ResourceConflictException;
 import com.edoardo.bbs.services.CustomerService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.javafaker.Faker;
+import lombok.SneakyThrows;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -34,7 +35,7 @@ import static org.mockito.Mockito.when;
 public class SaveTest {
 
     @MockBean
-    private CustomerService customerService;
+    private final CustomerService customerService;
 
     private final MockMvc mockMvc;
     private CustomerDTO customer;
@@ -71,193 +72,222 @@ public class SaveTest {
                 .build();
     }
 
-    @Test
-    public void testSaveCustomerReturnsConflictException () throws Exception {
+    @Test @SneakyThrows
+    public void testSaveCustomerReturnsConflictException () {
         when(this.customerService.createCustomer(this.customer)).thenThrow(new ResourceConflictException("Conflict."));
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/customers")
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
+                .post("/api/v1/customers")
                 .content(this.mapper.writeValueAsString(this.customer))
                 .contentType(MediaType.APPLICATION_JSON));
 
         result.andExpect(MockMvcResultMatchers.status().isConflict())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Conflict.")))
+                .andExpect(MockMvcResultMatchers
+                        .jsonPath("$.message", CoreMatchers.is("Conflict.")))
                 .andDo(MockMvcResultHandlers.print());
     }
 
-    @Test
-    public void testSaveCustomerWithoutFirstNameReturnsValidationException () throws Exception {
+    @Test @SneakyThrows
+    public void testSaveCustomerWithoutFirstNameReturnsValidationException () {
         this.customer.setFirstName(null);
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/customers")
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
+                .post("/api/v1/customers")
                 .content(this.mapper.writeValueAsString(this.customer))
                 .contentType(MediaType.APPLICATION_JSON));
 
         result.andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Customer first name must not be null.")))
+                .andExpect(MockMvcResultMatchers
+                        .jsonPath("$.message", CoreMatchers.is("Customer first name must not be null.")))
                 .andDo(MockMvcResultHandlers.print());
     }
 
-    @Test
-    public void testSaveCustomerWithoutLastNameReturnsValidationException () throws Exception {
+    @Test @SneakyThrows
+    public void testSaveCustomerWithoutLastNameReturnsValidationException () {
         this.customer.setLastName(null);
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/customers")
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
+                .post("/api/v1/customers")
                 .content(this.mapper.writeValueAsString(this.customer))
                 .contentType(MediaType.APPLICATION_JSON));
 
         result.andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Customer last name must not be null.")))
+                .andExpect(MockMvcResultMatchers
+                        .jsonPath("$.message", CoreMatchers.is("Customer last name must not be null.")))
                 .andDo(MockMvcResultHandlers.print());
     }
 
-    @Test
-    public void testSaveCustomerWithoutEmailReturnsValidationException () throws Exception {
+    @Test @SneakyThrows
+    public void testSaveCustomerWithoutEmailReturnsValidationException () {
         this.customer.setEmail(null);
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/customers")
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
+                .post("/api/v1/customers")
                 .content(this.mapper.writeValueAsString(this.customer))
                 .contentType(MediaType.APPLICATION_JSON));
 
         result.andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Customer email must not be null.")))
+                .andExpect(MockMvcResultMatchers
+                        .jsonPath("$.message", CoreMatchers.is("Customer email must not be null.")))
                 .andDo(MockMvcResultHandlers.print());
     }
 
-    @Test
-    public void testSaveCustomerWithoutPasswordReturnsValidationException () throws Exception {
+    @Test @SneakyThrows
+    public void testSaveCustomerWithoutPasswordReturnsValidationException () {
         this.customer.setPassword(null);
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/customers")
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
+                .post("/api/v1/customers")
                 .content(this.mapper.writeValueAsString(this.customer))
                 .contentType(MediaType.APPLICATION_JSON));
 
         result.andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Customer password must not be null.")))
+                .andExpect(MockMvcResultMatchers
+                        .jsonPath("$.message", CoreMatchers.is("Customer password must not be null.")))
                 .andDo(MockMvcResultHandlers.print());
     }
 
-    @Test
-    public void testSaveCustomerWithoutIdCardReturnsValidationException () throws Exception {
+    @Test @SneakyThrows
+    public void testSaveCustomerWithoutIdCardReturnsValidationException () {
         this.customer.setIdCard(null);
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/customers")
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
+                .post("/api/v1/customers")
                 .content(this.mapper.writeValueAsString(this.customer))
                 .contentType(MediaType.APPLICATION_JSON));
 
         result.andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Customer id card must not be null.")))
+                .andExpect(MockMvcResultMatchers
+                        .jsonPath("$.message", CoreMatchers.is("Customer id card must not be null.")))
                 .andDo(MockMvcResultHandlers.print());
     }
 
-    @Test
-    public void testSaveCustomerWithBlankFirstNameReturnsValidationException () throws Exception {
+    @Test @SneakyThrows
+    public void testSaveCustomerWithBlankFirstNameReturnsValidationException () {
         this.customer.setFirstName("");
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/customers")
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
+                .post("/api/v1/customers")
                 .content(this.mapper.writeValueAsString(this.customer))
                 .contentType(MediaType.APPLICATION_JSON));
 
         result.andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Customer first name length must be between 1 and 50 chars.")))
+                .andExpect(MockMvcResultMatchers
+                        .jsonPath("$.message", CoreMatchers.is("Customer first name length must be between 1 and 50 chars.")))
                 .andDo(MockMvcResultHandlers.print());
     }
 
-    @Test
-    public void testSaveCustomerWithBlankLastNameReturnsValidationException () throws Exception {
+    @Test @SneakyThrows
+    public void testSaveCustomerWithBlankLastNameReturnsValidationException () {
         this.customer.setLastName("");
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/customers")
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
+                .post("/api/v1/customers")
                 .content(this.mapper.writeValueAsString(this.customer))
                 .contentType(MediaType.APPLICATION_JSON));
 
         result.andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Customer last name length must be between 1 and 50 chars.")))
+                .andExpect(MockMvcResultMatchers
+                        .jsonPath("$.message", CoreMatchers.is("Customer last name length must be between 1 and 50 chars.")))
                 .andDo(MockMvcResultHandlers.print());
     }
 
-    @Test
-    public void testSaveCustomerWithBlankEmailReturnsValidationException () throws Exception {
+    @Test @SneakyThrows
+    public void testSaveCustomerWithBlankEmailReturnsValidationException () {
         this.customer.setEmail("");
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/customers")
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
+                .post("/api/v1/customers")
                 .content(this.mapper.writeValueAsString(this.customer))
                 .contentType(MediaType.APPLICATION_JSON));
 
         result.andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Customer email length must be between 1 and 50 chars.")))
+                .andExpect(MockMvcResultMatchers
+                        .jsonPath("$.message", CoreMatchers.is("Customer email length must be between 1 and 50 chars.")))
                 .andDo(MockMvcResultHandlers.print());
     }
 
-    @Test
-    public void testSaveCustomerWithBlankPasswordReturnsValidationException () throws Exception {
+    @Test @SneakyThrows
+    public void testSaveCustomerWithBlankPasswordReturnsValidationException () {
         this.customer.setPassword("");
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/customers")
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
+                .post("/api/v1/customers")
                 .content(this.mapper.writeValueAsString(this.customer))
                 .contentType(MediaType.APPLICATION_JSON));
 
         result.andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Customer password length must be between 1 and 50 chars.")))
+                .andExpect(MockMvcResultMatchers.
+                        jsonPath("$.message", CoreMatchers.is("Customer password length must be between 1 and 50 chars.")))
                 .andDo(MockMvcResultHandlers.print());
     }
 
-    @Test
-    public void testSaveCustomerWithBlankIdCardReturnsValidationException () throws Exception {
+    @Test @SneakyThrows
+    public void testSaveCustomerWithBlankIdCardReturnsValidationException () {
         this.customer.setIdCard("");
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/customers")
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
+                .post("/api/v1/customers")
                 .content(this.mapper.writeValueAsString(this.customer))
                 .contentType(MediaType.APPLICATION_JSON));
 
         result.andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Customer id card length must not be empty.")))
+                .andExpect(MockMvcResultMatchers
+                        .jsonPath("$.message", CoreMatchers.is("Customer id card length must not be empty.")))
                 .andDo(MockMvcResultHandlers.print());
     }
 
-    @Test
-    public void testSaveCustomerWithInvalidFirstNameLengthReturnsValidationException () throws Exception {
+    @Test @SneakyThrows
+    public void testSaveCustomerWithInvalidFirstNameLengthReturnsValidationException () {
         this.customer.setFirstName(faker.lorem().characters(51));
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/customers")
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
+                .post("/api/v1/customers")
                 .content(this.mapper.writeValueAsString(this.customer))
                 .contentType(MediaType.APPLICATION_JSON));
 
         result.andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Customer first name length must be between 1 and 50 chars.")))
+                .andExpect(MockMvcResultMatchers
+                        .jsonPath("$.message", CoreMatchers.is("Customer first name length must be between 1 and 50 chars.")))
                 .andDo(MockMvcResultHandlers.print());
     }
 
-    @Test
-    public void testSaveCustomerWithInvalidLastNameLengthReturnsValidationException () throws Exception {
+    @Test @SneakyThrows
+    public void testSaveCustomerWithInvalidLastNameLengthReturnsValidationException () {
         this.customer.setLastName(faker.lorem().characters(51));
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/customers")
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
+                .post("/api/v1/customers")
                 .content(this.mapper.writeValueAsString(this.customer))
                 .contentType(MediaType.APPLICATION_JSON));
 
         result.andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Customer last name length must be between 1 and 50 chars.")))
+                .andExpect(MockMvcResultMatchers
+                        .jsonPath("$.message", CoreMatchers.is("Customer last name length must be between 1 and 50 chars.")))
                 .andDo(MockMvcResultHandlers.print());
     }
 
-    @Test
-    public void testSaveCustomerWithInvalidEmailLengthReturnsValidationException () throws Exception {
+    @Test @SneakyThrows
+    public void testSaveCustomerWithInvalidEmailLengthReturnsValidationException () {
         this.customer.setEmail("notValidEmailAddress.notValidDomainAddress@NotValidEmail.com");
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/customers")
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
+                .post("/api/v1/customers")
                 .content(this.mapper.writeValueAsString(this.customer))
                 .contentType(MediaType.APPLICATION_JSON));
 
         result.andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Customer email length must be between 1 and 50 chars.")))
+                .andExpect(MockMvcResultMatchers
+                        .jsonPath("$.message", CoreMatchers.is("Customer email length must be between 1 and 50 chars.")))
                 .andDo(MockMvcResultHandlers.print());
     }
 
-    @Test
-    public void testSaveCustomerWithInvalidPasswordLengthReturnsValidationException () throws Exception {
+    @Test @SneakyThrows
+    public void testSaveCustomerWithInvalidPasswordLengthReturnsValidationException () {
         this.customer.setPassword(this.faker.lorem().characters(51));
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/customers")
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
+                .post("/api/v1/customers")
                 .content(this.mapper.writeValueAsString(this.customer))
                 .contentType(MediaType.APPLICATION_JSON));
 
@@ -265,37 +295,42 @@ public class SaveTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Customer password length must be between 1 and 50 chars.")))
                 .andDo(MockMvcResultHandlers.print());
     }
-    @Test
-    public void testSaveCustomerWithInvalidEmailReturnsValidationException () throws Exception {
+    @Test @SneakyThrows
+    public void testSaveCustomerWithInvalidEmailReturnsValidationException () {
         this.customer.setEmail(this.faker.lorem().characters(20));
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/customers")
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
+                .post("/api/v1/customers")
                 .content(this.mapper.writeValueAsString(this.customer))
                 .contentType(MediaType.APPLICATION_JSON));
 
         result.andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Customer email must be valid.")))
+                .andExpect(MockMvcResultMatchers
+                        .jsonPath("$.message", CoreMatchers.is("Customer email must be valid.")))
                 .andDo(MockMvcResultHandlers.print());
     }
 
-    @Test
-    public void testSaveCustomerNotAdultReturnsValidationException () throws Exception {
+    @Test @SneakyThrows
+    public void testSaveCustomerNotAdultReturnsValidationException () {
         this.customer.setBirthDate(this.faker.date().birthday(10, 17).toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/customers")
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
+                .post("/api/v1/customers")
                 .content(this.mapper.writeValueAsString(this.customer))
                 .contentType(MediaType.APPLICATION_JSON));
 
         result.andExpect(MockMvcResultMatchers.status().isBadRequest())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Customer must be adult.")))
+                .andExpect(MockMvcResultMatchers
+                        .jsonPath("$.message", CoreMatchers.is("Customer must be adult.")))
                 .andDo(MockMvcResultHandlers.print());
     }
 
-    @Test
-    public void testSaveCustomerReturnsCreatedResponse () throws Exception {
+    @Test @SneakyThrows
+    public void testSaveCustomerReturnsCreatedResponse () {
         when(this.customerService.createCustomer(this.customer)).thenReturn(this.customer);
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.post("/api/v1/customers")
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
+                .post("/api/v1/customers")
                 .content(this.mapper.writeValueAsString(this.customer))
                 .contentType(MediaType.APPLICATION_JSON));
 

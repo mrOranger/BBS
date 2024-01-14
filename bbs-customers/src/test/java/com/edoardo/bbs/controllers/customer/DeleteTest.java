@@ -7,6 +7,7 @@ import com.edoardo.bbs.exceptions.ResourceNotFoundException;
 import com.edoardo.bbs.services.CustomerService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.javafaker.Faker;
+import lombok.SneakyThrows;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -40,7 +41,6 @@ public class DeleteTest {
     private final MockMvc mockMvc;
     private final String baseUrl;
 
-
     @Autowired
     public DeleteTest (MockMvc mockMvc, CustomerService customerService, ObjectMapper mapper) {
         this.customerService = customerService;
@@ -73,11 +73,13 @@ public class DeleteTest {
                 .build();
     }
 
-    @Test
-    public void testDeleteCustomerReturnsNotFoundException () throws Exception {
-        when(this.customerService.deleteCustomer(this.customer.getTaxCode())).thenThrow(new ResourceNotFoundException("Not found."));
+    @Test @SneakyThrows
+    public void testDeleteCustomerReturnsNotFoundException () {
+        when(this.customerService.deleteCustomer(this.customer.getTaxCode()))
+                .thenThrow(new ResourceNotFoundException("Not found."));
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.delete(this.baseUrl + customer.getTaxCode())
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
+                .delete(this.baseUrl + customer.getTaxCode())
                 .content(this.mapper.writeValueAsString(this.customer))
                 .contentType(MediaType.APPLICATION_JSON));
 
@@ -86,11 +88,13 @@ public class DeleteTest {
                 .andDo(MockMvcResultHandlers.print());
     }
 
-    @Test
-    public void testDeleteCustomerReturnsOkResponse () throws Exception {
-        when(this.customerService.deleteCustomer(this.customer.getTaxCode())).thenReturn(this.customer);
+    @Test @SneakyThrows
+    public void testDeleteCustomerReturnsOkResponse () {
+        when(this.customerService.deleteCustomer(this.customer.getTaxCode()))
+                .thenReturn(this.customer);
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.delete(this.baseUrl + customer.getTaxCode())
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
+                .delete(this.baseUrl + customer.getTaxCode())
                 .content(this.mapper.writeValueAsString(this.customer))
                 .contentType(MediaType.APPLICATION_JSON));
 

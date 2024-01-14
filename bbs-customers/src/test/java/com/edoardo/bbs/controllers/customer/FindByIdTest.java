@@ -6,6 +6,7 @@ import com.edoardo.bbs.dtos.CustomerDTO;
 import com.edoardo.bbs.exceptions.ResourceNotFoundException;
 import com.edoardo.bbs.services.CustomerService;
 import com.github.javafaker.Faker;
+import lombok.SneakyThrows;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -68,11 +69,13 @@ public class FindByIdTest {
                 .build();
     }
 
-    @Test
-    public void testGetCustomerByIdThrowsNotFoundException () throws Exception {
-        when(this.customerService.getCustomerByTaxCode(this.customer.getTaxCode())).thenThrow(new ResourceNotFoundException("Not found."));
+    @Test @SneakyThrows
+    public void testGetCustomerByIdThrowsNotFoundException () {
+        when(this.customerService.getCustomerByTaxCode(this.customer.getTaxCode()))
+                .thenThrow(new ResourceNotFoundException("Not found."));
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/customers/{customerId}", this.customer.getTaxCode())
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
+                .get("/api/v1/customers/{customerId}", this.customer.getTaxCode())
                 .contentType(MediaType.APPLICATION_JSON));
 
         result.andExpect(MockMvcResultMatchers.status().isNotFound())
@@ -80,11 +83,12 @@ public class FindByIdTest {
                 .andDo(MockMvcResultHandlers.print());
     }
 
-    @Test
-    public void testGetCustomerByIdReturnsManyCustomers () throws Exception {
+    @Test @SneakyThrows
+    public void testGetCustomerByIdReturnsManyCustomers () {
         when(this.customerService.getCustomerByTaxCode(this.customer.getTaxCode())).thenReturn(this.customer);
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/customers/{customerId}", this.customer.getTaxCode())
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
+                .get("/api/v1/customers/{customerId}", this.customer.getTaxCode())
                 .contentType(MediaType.APPLICATION_JSON));
 
         result.andExpect(MockMvcResultMatchers.status().isOk())

@@ -66,7 +66,7 @@ public class FindByIdTest {
 
         this.address.setCustomer(this.customer);
         this.customerRepository.save(this.customer);
-        final Address updatedAddress = this.addressRepository.save(this.address);
+        this.addressRepository.save(this.address);
 
         final Optional<Address> customer = this.addressRepository.findById(this.address.getId().toString());
 

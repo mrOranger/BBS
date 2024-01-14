@@ -6,6 +6,7 @@ import com.edoardo.bbs.dtos.CustomerDTO;
 import com.edoardo.bbs.dtos.CustomerResponse;
 import com.edoardo.bbs.services.CustomerService;
 import com.github.javafaker.Faker;
+import lombok.SneakyThrows;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -70,8 +71,8 @@ public class FindAllTest {
         }
     }
 
-    @Test
-    public void testGetAllCustomersReturnsEmptyCollection () throws Exception {
+    @Test @SneakyThrows
+    public void testGetAllCustomersReturnsEmptyCollection () {
         CustomerResponse response = CustomerResponse.builder().pageSize(0)
                 .last(true)
                 .totalPages(0)
@@ -79,17 +80,19 @@ public class FindAllTest {
                 .build();
         when(this.customerService.getAllCustomers(PageRequest.of(1, 10))).thenReturn(response);
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/customers")
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
+                .get("/api/v1/customers")
                 .contentType(MediaType.APPLICATION_JSON)
                 .param("pageNo", "1")
                 .param("pageSize", "10"));
 
         result.andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content.size()", CoreMatchers.is(response.getContent().size())));
+                .andExpect(MockMvcResultMatchers
+                        .jsonPath("$.content.size()", CoreMatchers.is(response.getContent().size())));
     }
 
-    @Test
-    public void testGetAllCustomersReturnsManyCustomers () throws Exception {
+    @Test @SneakyThrows
+    public void testGetAllCustomersReturnsManyCustomers () {
         CustomerResponse response = CustomerResponse.builder().pageSize(10)
                 .last(true)
                 .totalPages(1)
@@ -97,12 +100,14 @@ public class FindAllTest {
                 .build();
         when(this.customerService.getAllCustomers(PageRequest.of(1, 10))).thenReturn(response);
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.get("/api/v1/customers")
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
+                .get("/api/v1/customers")
                 .contentType(MediaType.APPLICATION_JSON)
                 .param("pageNo", "1")
                 .param("pageSize", "10"));
 
         result.andExpect(MockMvcResultMatchers.status().isOk())
-                .andExpect(MockMvcResultMatchers.jsonPath("$.content.size()", CoreMatchers.is(response.getContent().size())));
+                .andExpect(MockMvcResultMatchers
+                        .jsonPath("$.content.size()", CoreMatchers.is(response.getContent().size())));
     }
 }

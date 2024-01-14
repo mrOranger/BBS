@@ -11,6 +11,7 @@ import com.edoardo.bbs.repositories.AddressRepository;
 import com.edoardo.bbs.repositories.CustomerRepository;
 import com.edoardo.bbs.services.implementation.AddressServiceImpl;
 import com.github.javafaker.Faker;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -76,7 +77,8 @@ public class AddAddressTest {
     public void testAddAddressToNotExistingCustomerThrowsException () {
         when(this.customerRepository.findById(this.customer.getTaxCode())).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> this.addressService.addAddress(this.customer.getTaxCode(), this.mapToDto(this.address)));
+        assertThrows(ResourceNotFoundException.class,
+                () -> this.addressService.addAddress(this.customer.getTaxCode(), this.mapToDto(this.address)));
     }
 
     @Test
@@ -94,11 +96,12 @@ public class AddAddressTest {
 
         when(this.customerRepository.findById(this.customer.getTaxCode())).thenReturn(Optional.ofNullable(this.customer));
 
-        assertThrows(MaximumAddressNumberException.class, () -> this.addressService.addAddress(this.customer.getTaxCode(), this.mapToDto(this.address)));
+        assertThrows(MaximumAddressNumberException.class,
+                () -> this.addressService.addAddress(this.customer.getTaxCode(), this.mapToDto(this.address)));
     }
 
     @Test
-    public void testAddAddressToCustomerWithoutOneReturnsCustomer () throws MaximumAddressNumberException, ResourceNotFoundException {
+    public void testAddAddressToCustomerWithoutOneReturnsCustomer ()  {
         when(this.customerRepository.findById(this.customer.getTaxCode())).thenReturn(Optional.ofNullable(this.customer));
         when(this.addressMapper.convertToDTO(Mockito.any(Address.class))).thenReturn(this.mapToDto(address));
         when(this.addressMapper.convertToEntity(Mockito.any(AddressDTO.class))).thenReturn(this.address);
@@ -111,7 +114,7 @@ public class AddAddressTest {
     }
 
     @Test
-    public void testAddAddressToCustomerWithOneReturnsAddress () throws MaximumAddressNumberException, ResourceNotFoundException {
+    public void testAddAddressToCustomerWithOneReturnsAddress () {
         this.customer.getAddresses().add(Address.builder()
                 .country(this.faker.address().country())
                 .state(this.faker.address().state())

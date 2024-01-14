@@ -7,6 +7,7 @@ import com.edoardo.bbs.exceptions.ResourceNotFoundException;
 import com.edoardo.bbs.services.CustomerService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.javafaker.Faker;
+import lombok.SneakyThrows;
 import org.hamcrest.CoreMatchers;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -33,7 +34,7 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class UpdateTest {
     @MockBean
-    private CustomerService customerService;
+    private final CustomerService customerService;
 
     private final MockMvc mockMvc;
     private CustomerDTO customer;
@@ -73,11 +74,12 @@ public class UpdateTest {
                 .build();
     }
 
-    @Test
-    public void testUpdateCustomerReturnsNotFoundException () throws Exception {
+    @Test @SneakyThrows
+    public void testUpdateCustomerReturnsNotFoundException () {
         when(this.customerService.updateCustomer(this.customer.getTaxCode(), this.customer)).thenThrow(new ResourceNotFoundException("Not found."));
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.put(this.baseUrl + customer.getTaxCode())
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
+                .put(this.baseUrl + customer.getTaxCode())
                 .content(this.mapper.writeValueAsString(this.customer))
                 .contentType(MediaType.APPLICATION_JSON));
 
@@ -86,11 +88,12 @@ public class UpdateTest {
                 .andDo(MockMvcResultHandlers.print());
     }
 
-    @Test
-    public void testUpdateCustomerWithoutFirstNameReturnsValidationException () throws Exception {
+    @Test @SneakyThrows
+    public void testUpdateCustomerWithoutFirstNameReturnsValidationException () {
         this.customer.setFirstName(null);
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.put(this.baseUrl + customer.getTaxCode())
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
+                .put(this.baseUrl + customer.getTaxCode())
                 .content(this.mapper.writeValueAsString(this.customer))
                 .contentType(MediaType.APPLICATION_JSON));
 
@@ -99,11 +102,12 @@ public class UpdateTest {
                 .andDo(MockMvcResultHandlers.print());
     }
 
-    @Test
-    public void testUpdateCustomerWithoutLastNameReturnsValidationException () throws Exception {
+    @Test @SneakyThrows
+    public void testUpdateCustomerWithoutLastNameReturnsValidationException () {
         this.customer.setLastName(null);
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.put(this.baseUrl + customer.getTaxCode())
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
+                .put(this.baseUrl + customer.getTaxCode())
                 .content(this.mapper.writeValueAsString(this.customer))
                 .contentType(MediaType.APPLICATION_JSON));
 
@@ -112,11 +116,12 @@ public class UpdateTest {
                 .andDo(MockMvcResultHandlers.print());
     }
 
-    @Test
-    public void testUpdateCustomerWithoutEmailReturnsValidationException () throws Exception {
+    @Test @SneakyThrows
+    public void testUpdateCustomerWithoutEmailReturnsValidationException () {
         this.customer.setEmail(null);
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.put(this.baseUrl + customer.getTaxCode())
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
+                .put(this.baseUrl + customer.getTaxCode())
                 .content(this.mapper.writeValueAsString(this.customer))
                 .contentType(MediaType.APPLICATION_JSON));
 
@@ -125,11 +130,12 @@ public class UpdateTest {
                 .andDo(MockMvcResultHandlers.print());
     }
 
-    @Test
-    public void testUpdateCustomerWithoutPasswordReturnsValidationException () throws Exception {
+    @Test @SneakyThrows
+    public void testUpdateCustomerWithoutPasswordReturnsValidationException () {
         this.customer.setPassword(null);
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.put(this.baseUrl + customer.getTaxCode())
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
+                .put(this.baseUrl + customer.getTaxCode())
                 .content(this.mapper.writeValueAsString(this.customer))
                 .contentType(MediaType.APPLICATION_JSON));
 
@@ -138,11 +144,12 @@ public class UpdateTest {
                 .andDo(MockMvcResultHandlers.print());
     }
 
-    @Test
-    public void testUpdateCustomerWithoutIdCardReturnsValidationException () throws Exception {
+    @Test @SneakyThrows
+    public void testUpdateCustomerWithoutIdCardReturnsValidationException () {
         this.customer.setIdCard(null);
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.put(this.baseUrl + customer.getTaxCode())
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
+                .put(this.baseUrl + customer.getTaxCode())
                 .content(this.mapper.writeValueAsString(this.customer))
                 .contentType(MediaType.APPLICATION_JSON));
 
@@ -151,11 +158,12 @@ public class UpdateTest {
                 .andDo(MockMvcResultHandlers.print());
     }
 
-    @Test
-    public void testUpdateCustomerWithBlankFirstNameReturnsValidationException () throws Exception {
+    @Test @SneakyThrows
+    public void testUpdateCustomerWithBlankFirstNameReturnsValidationException () {
         this.customer.setFirstName("");
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.put(this.baseUrl + customer.getTaxCode())
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
+                .put(this.baseUrl + customer.getTaxCode())
                 .content(this.mapper.writeValueAsString(this.customer))
                 .contentType(MediaType.APPLICATION_JSON));
 
@@ -164,11 +172,12 @@ public class UpdateTest {
                 .andDo(MockMvcResultHandlers.print());
     }
 
-    @Test
-    public void testUpdateCustomerWithBlankLastNameReturnsValidationException () throws Exception {
+    @Test @SneakyThrows
+    public void testUpdateCustomerWithBlankLastNameReturnsValidationException () {
         this.customer.setLastName("");
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.put(this.baseUrl + customer.getTaxCode())
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
+                .put(this.baseUrl + customer.getTaxCode())
                 .content(this.mapper.writeValueAsString(this.customer))
                 .contentType(MediaType.APPLICATION_JSON));
 
@@ -177,11 +186,12 @@ public class UpdateTest {
                 .andDo(MockMvcResultHandlers.print());
     }
 
-    @Test
-    public void testUpdateCustomerWithBlankEmailReturnsValidationException () throws Exception {
+    @Test @SneakyThrows
+    public void testUpdateCustomerWithBlankEmailReturnsValidationException () {
         this.customer.setEmail("");
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.put(this.baseUrl + customer.getTaxCode())
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
+                .put(this.baseUrl + customer.getTaxCode())
                 .content(this.mapper.writeValueAsString(this.customer))
                 .contentType(MediaType.APPLICATION_JSON));
 
@@ -190,11 +200,12 @@ public class UpdateTest {
                 .andDo(MockMvcResultHandlers.print());
     }
 
-    @Test
-    public void testUpdateCustomerWithBlankPasswordReturnsValidationException () throws Exception {
+    @Test @SneakyThrows
+    public void testUpdateCustomerWithBlankPasswordReturnsValidationException () {
         this.customer.setPassword("");
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.put(this.baseUrl + customer.getTaxCode())
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
+                .put(this.baseUrl + customer.getTaxCode())
                 .content(this.mapper.writeValueAsString(this.customer))
                 .contentType(MediaType.APPLICATION_JSON));
 
@@ -203,11 +214,12 @@ public class UpdateTest {
                 .andDo(MockMvcResultHandlers.print());
     }
 
-    @Test
-    public void testUpdateCustomerWithBlankIdCardReturnsValidationException () throws Exception {
+    @Test @SneakyThrows
+    public void testUpdateCustomerWithBlankIdCardReturnsValidationException () {
         this.customer.setIdCard("");
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.put(this.baseUrl + customer.getTaxCode())
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
+                .put(this.baseUrl + customer.getTaxCode())
                 .content(this.mapper.writeValueAsString(this.customer))
                 .contentType(MediaType.APPLICATION_JSON));
 
@@ -216,11 +228,12 @@ public class UpdateTest {
                 .andDo(MockMvcResultHandlers.print());
     }
 
-    @Test
-    public void testUpdateCustomerWithInvalidFirstNameLengthReturnsValidationException () throws Exception {
+    @Test @SneakyThrows
+    public void testUpdateCustomerWithInvalidFirstNameLengthReturnsValidationException () {
         this.customer.setFirstName(faker.lorem().characters(51));
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.put(this.baseUrl + customer.getTaxCode())
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
+                .put(this.baseUrl + customer.getTaxCode())
                 .content(this.mapper.writeValueAsString(this.customer))
                 .contentType(MediaType.APPLICATION_JSON));
 
@@ -229,11 +242,12 @@ public class UpdateTest {
                 .andDo(MockMvcResultHandlers.print());
     }
 
-    @Test
-    public void testUpdateCustomerWithInvalidLastNameLengthReturnsValidationException () throws Exception {
+    @Test @SneakyThrows
+    public void testUpdateCustomerWithInvalidLastNameLengthReturnsValidationException () {
         this.customer.setLastName(faker.lorem().characters(51));
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.put(this.baseUrl + customer.getTaxCode())
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
+                .put(this.baseUrl + customer.getTaxCode())
                 .content(this.mapper.writeValueAsString(this.customer))
                 .contentType(MediaType.APPLICATION_JSON));
 
@@ -242,11 +256,12 @@ public class UpdateTest {
                 .andDo(MockMvcResultHandlers.print());
     }
 
-    @Test
-    public void testUpdateCustomerWithInvalidEmailLengthReturnsValidationException () throws Exception {
+    @Test @SneakyThrows
+    public void testUpdateCustomerWithInvalidEmailLengthReturnsValidationException () {
         this.customer.setEmail("notValidEmailAddress.notValidDomainAddress@NotValidEmail.com");
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.put(this.baseUrl + customer.getTaxCode())
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
+                .put(this.baseUrl + customer.getTaxCode())
                 .content(this.mapper.writeValueAsString(this.customer))
                 .contentType(MediaType.APPLICATION_JSON));
 
@@ -255,11 +270,12 @@ public class UpdateTest {
                 .andDo(MockMvcResultHandlers.print());
     }
 
-    @Test
-    public void testUpdateCustomerWithInvalidPasswordLengthReturnsValidationException () throws Exception {
+    @Test @SneakyThrows
+    public void testUpdateCustomerWithInvalidPasswordLengthReturnsValidationException () {
         this.customer.setPassword(this.faker.lorem().characters(51));
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.put(this.baseUrl + customer.getTaxCode())
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
+                .put(this.baseUrl + customer.getTaxCode())
                 .content(this.mapper.writeValueAsString(this.customer))
                 .contentType(MediaType.APPLICATION_JSON));
 
@@ -267,11 +283,12 @@ public class UpdateTest {
                 .andExpect(MockMvcResultMatchers.jsonPath("$.message", CoreMatchers.is("Customer password length must be between 1 and 50 chars.")))
                 .andDo(MockMvcResultHandlers.print());
     }
-    @Test
-    public void testUpdateCustomerWithInvalidEmailReturnsValidationException () throws Exception {
+    @Test @SneakyThrows
+    public void testUpdateCustomerWithInvalidEmailReturnsValidationException () {
         this.customer.setEmail(this.faker.lorem().characters(20));
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.put(this.baseUrl + customer.getTaxCode())
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
+                .put(this.baseUrl + customer.getTaxCode())
                 .content(this.mapper.writeValueAsString(this.customer))
                 .contentType(MediaType.APPLICATION_JSON));
 
@@ -280,11 +297,12 @@ public class UpdateTest {
                 .andDo(MockMvcResultHandlers.print());
     }
 
-    @Test
-    public void testUpdateCustomerNotAdultReturnsValidationException () throws Exception {
+    @Test @SneakyThrows
+    public void testUpdateCustomerNotAdultReturnsValidationException () {
         this.customer.setBirthDate(this.faker.date().birthday(10, 17).toInstant().atZone(ZoneId.systemDefault()).toLocalDate());
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.put(this.baseUrl + customer.getTaxCode())
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
+                .put(this.baseUrl + customer.getTaxCode())
                 .content(this.mapper.writeValueAsString(this.customer))
                 .contentType(MediaType.APPLICATION_JSON));
 
@@ -293,11 +311,12 @@ public class UpdateTest {
                 .andDo(MockMvcResultHandlers.print());
     }
 
-    @Test
-    public void testUpdateCustomerReturnsOkResponse () throws Exception {
+    @Test @SneakyThrows
+    public void testUpdateCustomerReturnsOkResponse () {
         when(this.customerService.updateCustomer(this.customer.getTaxCode(), this.customer)).thenReturn(this.customer);
 
-        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders.put(this.baseUrl + customer.getTaxCode())
+        ResultActions result = this.mockMvc.perform(MockMvcRequestBuilders
+                .put(this.baseUrl + customer.getTaxCode())
                 .content(this.mapper.writeValueAsString(this.customer))
                 .contentType(MediaType.APPLICATION_JSON));
 
