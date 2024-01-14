@@ -2,13 +2,15 @@ package com.edoardo.bbs.dtos;
 
 import com.edoardo.bbs.validation.rules.BirthDateValid;
 import jakarta.validation.constraints.*;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
 import java.util.Set;
 
-@Data @Builder
+@Data @Builder @NoArgsConstructor @AllArgsConstructor
 public class CustomerDTO {
 
     @NotNull(message = "Customer first name must not be null.")
