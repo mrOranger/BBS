@@ -10,6 +10,7 @@ import com.edoardo.bbs.repositories.AddressRepository;
 import com.edoardo.bbs.repositories.CustomerRepository;
 import com.edoardo.bbs.services.implementation.AddressServiceImpl;
 import com.github.javafaker.Faker;
+import lombok.SneakyThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -86,11 +87,12 @@ public class DeleteAddressTest {
         assertThrows(ResourceNotFoundException.class, () -> this.addressService.deleteAddress(this.customer.getTaxCode(), this.address.getId().toString()));
     }
 
-    @Test
-    public void testDeleteAddressToCustomerWithOneReturnsAddress () throws ResourceNotFoundException {
+    @Test @SneakyThrows
+    public void testDeleteAddressToCustomerWithOneReturnsAddress () {
         this.customer.getAddresses().add(this.address);
 
         when(this.customerRepository.findById(this.customer.getTaxCode())).thenReturn(Optional.ofNullable(this.customer));
+        when(this.addressRepository.findById(this.address.getId().toString())).thenReturn(Optional.ofNullable(this.address));
         when(this.addressMapper.convertToDTO(Mockito.any(Address.class))).thenReturn(this.mapToDto(address));
         doNothing().when(this.addressRepository).delete(this.address);
 

@@ -6,6 +6,7 @@ import com.edoardo.bbs.entities.Address;
 import com.edoardo.bbs.entities.Customer;
 import com.edoardo.bbs.exceptions.ResourceNotFoundException;
 import com.edoardo.bbs.mapper.AddressMapper;
+import com.edoardo.bbs.mapper.CustomerMapper;
 import com.edoardo.bbs.repositories.AddressRepository;
 import com.edoardo.bbs.repositories.CustomerRepository;
 import com.edoardo.bbs.services.implementation.AddressServiceImpl;
@@ -30,6 +31,8 @@ import static org.mockito.Mockito.when;
 @ExtendWith(MockitoExtension.class)
 public class UpdateAddressTest {
 
+    @Mock
+    private CustomerMapper customerMapper;
     @Mock
     private AddressMapper addressMapper;
     @Mock
