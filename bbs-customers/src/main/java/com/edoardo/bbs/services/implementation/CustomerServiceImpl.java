@@ -65,7 +65,7 @@ public class CustomerServiceImpl implements CustomerService {
         if (customer.isPresent()) {
             return customer.map(this.customerModelMapper::convertToDTO).get();
         }
-        throw new ResourceNotFoundException();
+        throw new ResourceNotFoundException("Customer " + taxCode + " not found.");
     }
 
     @Override
