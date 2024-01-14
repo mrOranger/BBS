@@ -36,4 +36,12 @@ public class AddressController {
     ) {
         return ResponseEntity.ok(this.addressService.updateAddress(customer, address, addressDTO));
     }
+
+    @DeleteMapping(value = "/addresses/address/{address}/customer/{customer}", produces = "application/json") @SneakyThrows
+    public ResponseEntity<AddressDTO> deleteAddressCustomer (
+            @PathVariable String address,
+            @PathVariable String customer
+    ) {
+        return ResponseEntity.ok(this.addressService.deleteAddress(customer, address));
+    }
 }
