@@ -52,7 +52,7 @@ public class AddAddressTest {
                 .city(this.faker.address().city())
                 .country(this.faker.address().country())
                 .street(this.faker.address().streetName())
-                .streetNumber(Integer.parseInt(this.faker.address().streetAddressNumber()))
+                .streetNumber(this.faker.number().numberBetween(1, 100))
                 .postalCode(this.faker.address().zipCode())
                 .build();
     }

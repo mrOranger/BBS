@@ -4,11 +4,15 @@ import com.edoardo.bbs.dtos.CustomerDTO;
 import com.edoardo.bbs.dtos.CustomerResponse;
 import com.edoardo.bbs.entities.Address;
 import com.edoardo.bbs.entities.Customer;
+import com.edoardo.bbs.exceptions.MaximumAddressNumberException;
 import com.edoardo.bbs.exceptions.ResourceConflictException;
 import com.edoardo.bbs.exceptions.ResourceNotFoundException;
+import com.edoardo.bbs.mapper.AddressMapper;
 import com.edoardo.bbs.mapper.CustomerMapper;
+import com.edoardo.bbs.repositories.AddressRepository;
 import com.edoardo.bbs.repositories.CustomerRepository;
 import com.edoardo.bbs.services.CustomerService;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,12 +23,21 @@ import java.util.*;
 
 @Service
 public class CustomerServiceImpl implements CustomerService {
-
     private final CustomerRepository customerRepository;
+
+    private final AddressRepository addressRepository;
     private final CustomerMapper customerModelMapper;
+    private final AddressMapper addressMapper;
 
     @Autowired
-    public CustomerServiceImpl(CustomerRepository customerRepository, CustomerMapper customerModelMapper) {
+    public CustomerServiceImpl(
+            CustomerRepository customerRepository,
+            AddressRepository addressRepository,
+            CustomerMapper customerModelMapper,
+            AddressMapper addressMapper
+    ) {
+        this.addressMapper = addressMapper;
+        this.addressRepository = addressRepository;
         this.customerRepository = customerRepository;
         this.customerModelMapper = customerModelMapper;
     }
@@ -59,8 +72,8 @@ public class CustomerServiceImpl implements CustomerService {
                 .toList();
     }
 
-    @Override
-    public CustomerDTO getCustomerByTaxCode(String taxCode) throws ResourceNotFoundException {
+    @Override @SneakyThrows
+    public CustomerDTO getCustomerByTaxCode(String taxCode) {
         final Optional<Customer> customer = this.customerRepository.findById(taxCode);
         if (customer.isPresent()) {
             return customer.map(this.customerModelMapper::convertToDTO).get();
@@ -68,74 +81,31 @@ public class CustomerServiceImpl implements CustomerService {
         throw new ResourceNotFoundException("Customer " + taxCode + " not found.");
     }
 
-    @Override
-    public CustomerDTO createCustomer(CustomerDTO customer) throws ResourceConflictException {
+    @Override @SneakyThrows
+    public CustomerDTO createCustomer(CustomerDTO customer) {
         final Optional<Customer> existingCustomer = this.customerRepository.findById(customer.getTaxCode());
         if (existingCustomer.isEmpty()) {
-            final Set<Address> addresses = new HashSet<>();
-            customer.getAddresses().forEach((entity) -> {
-                final Address address = Address.builder()
-                        .country(entity.getCountry())
-                        .state(entity.getState())
-                        .city(entity.getCity())
-                        .street(entity.getStreet())
-                        .streetNumber(entity.getStreetNumber())
-                        .postalCode(entity.getPostalCode())
-                        .build();
-                addresses.add(address);
-            });
-            final Customer customerEntity = Customer.builder()
-                    .taxCode(customer.getTaxCode())
-                    .firstName(customer.getFirstName())
-                    .lastName(customer.getLastName())
-                    .birthDate(customer.getBirthDate())
-                    .email(customer.getEmail())
-                    .emailVerifiedAt(customer.getEmailVerifiedAt())
-                    .password(customer.getPassword())
-                    .idCard(customer.getIdCard())
-                    .addresses(addresses)
-                    .build();
-
+            final Customer customerEntity = this.customerModelMapper.convertToEntity(customer);
+            customerEntity.getAddresses().forEach(address -> address.setCustomer(customerEntity));
             return this.customerModelMapper.convertToDTO(this.customerRepository.save(customerEntity));
         }
         throw new ResourceConflictException("Conflict.");
     }
 
-    @Override
-    public CustomerDTO updateCustomer(String taxCode, CustomerDTO customer) throws ResourceNotFoundException {
+    @Override @SneakyThrows
+    public CustomerDTO updateCustomer(String taxCode, CustomerDTO customer) {
         final Optional<Customer> existingCustomer = this.customerRepository.findById(taxCode);
         if (existingCustomer.isPresent()) {
-            final Set<Address> addresses = new HashSet<>();
-            customer.getAddresses().forEach((entity) -> {
-                final Address address = Address.builder()
-                        .country(entity.getCountry())
-                        .state(entity.getState())
-                        .city(entity.getCity())
-                        .street(entity.getStreet())
-                        .streetNumber(entity.getStreetNumber())
-                        .postalCode(entity.getPostalCode())
-                        .build();
-                addresses.add(address);
-            });
-            final Customer customerEntity = Customer.builder()
-                    .taxCode(customer.getTaxCode())
-                    .firstName(customer.getFirstName())
-                    .lastName(customer.getLastName())
-                    .birthDate(customer.getBirthDate())
-                    .email(customer.getEmail())
-                    .emailVerifiedAt(customer.getEmailVerifiedAt())
-                    .password(customer.getPassword())
-                    .idCard(customer.getIdCard())
-                    .addresses(addresses)
-                    .build();
-
+            customer.setTaxCode(taxCode);
+            final Customer customerEntity = this.customerModelMapper.convertToEntity(customer);
+            customerEntity.getAddresses().forEach(address -> address.setCustomer(customerEntity));
             return this.customerModelMapper.convertToDTO(this.customerRepository.save(customerEntity));
         }
         throw new ResourceNotFoundException("Not found.");
     }
 
-    @Override
-    public CustomerDTO deleteCustomer(String taxCode) throws ResourceNotFoundException {
+    @Override @SneakyThrows
+    public CustomerDTO deleteCustomer(String taxCode) {
         final Optional<Customer> existingCustomer = this.customerRepository.findById(taxCode);
         if (existingCustomer.isEmpty()) {
             throw new ResourceNotFoundException();

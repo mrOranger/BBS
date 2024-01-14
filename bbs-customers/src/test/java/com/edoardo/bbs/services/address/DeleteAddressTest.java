@@ -6,6 +6,7 @@ import com.edoardo.bbs.entities.Address;
 import com.edoardo.bbs.entities.Customer;
 import com.edoardo.bbs.exceptions.ResourceNotFoundException;
 import com.edoardo.bbs.mapper.AddressMapper;
+import com.edoardo.bbs.repositories.AddressRepository;
 import com.edoardo.bbs.repositories.CustomerRepository;
 import com.edoardo.bbs.services.implementation.AddressServiceImpl;
 import com.github.javafaker.Faker;
@@ -23,6 +24,7 @@ import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 
 
@@ -31,6 +33,8 @@ public class DeleteAddressTest {
 
     @Mock
     private AddressMapper addressMapper;
+    @Mock
+    private AddressRepository addressRepository;
     @Mock
     private CustomerRepository customerRepository;
     @InjectMocks
@@ -88,6 +92,7 @@ public class DeleteAddressTest {
 
         when(this.customerRepository.findById(this.customer.getTaxCode())).thenReturn(Optional.ofNullable(this.customer));
         when(this.addressMapper.convertToDTO(Mockito.any(Address.class))).thenReturn(this.mapToDto(address));
+        doNothing().when(this.addressRepository).delete(this.address);
 
         final AddressDTO address = this.addressService.deleteAddress(this.customer.getTaxCode(), this.address.getId().toString());
 
