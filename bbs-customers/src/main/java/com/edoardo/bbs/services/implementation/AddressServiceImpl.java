@@ -6,32 +6,39 @@ import com.edoardo.bbs.entities.Customer;
 import com.edoardo.bbs.exceptions.MaximumAddressNumberException;
 import com.edoardo.bbs.exceptions.ResourceNotFoundException;
 import com.edoardo.bbs.mapper.AddressMapper;
+import com.edoardo.bbs.mapper.CustomerMapper;
 import com.edoardo.bbs.repositories.AddressRepository;
 import com.edoardo.bbs.repositories.CustomerRepository;
 import com.edoardo.bbs.services.AddressService;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.Optional;
-import java.util.Set;
 
 @Service
 public class AddressServiceImpl implements AddressService {
 
     private final CustomerRepository customerRepository;
     private final AddressRepository addressRepository;
+    private final CustomerMapper customerMapper;
     private final AddressMapper addressMapper;
 
     @Autowired
-    public AddressServiceImpl(AddressRepository addressRepository, CustomerRepository customerRepository, AddressMapper addressMapper) {
+    public AddressServiceImpl(
+            AddressRepository addressRepository,
+            CustomerRepository customerRepository,
+            CustomerMapper customerMapper,
+            AddressMapper addressMapper
+    ) {
         this.customerRepository = customerRepository;
         this.addressRepository = addressRepository;
+        this.customerMapper = customerMapper;
         this.addressMapper = addressMapper;
     }
 
-
-    @Override
-    public AddressDTO addAddress(String taxCode, AddressDTO address) throws MaximumAddressNumberException, ResourceNotFoundException {
+    @Override @SneakyThrows
+    public AddressDTO addAddress(String taxCode, AddressDTO address)  {
         final Optional<Customer> customer = this.customerRepository.findById(taxCode);
         if (customer.isPresent()) {
             final Customer customerEntity = customer.get();
@@ -45,36 +52,31 @@ public class AddressServiceImpl implements AddressService {
         throw new ResourceNotFoundException("Customer " + taxCode + " not found.");
     }
 
-    @Override
-    public AddressDTO updateAddress(String taxCode, String addressId, AddressDTO address) throws ResourceNotFoundException {
+    @Override @SneakyThrows
+    public AddressDTO updateAddress(String taxCode, String addressId, AddressDTO address) {
         final Optional<Customer> customer = this.customerRepository.findById(taxCode);
         if (customer.isPresent()) {
-            final Customer customerEntity = customer.get();
             final Optional<Address> foundAddress = this.addressRepository.findById(addressId);
             if (foundAddress.isPresent()) {
                 address.setId(Integer.parseInt(addressId));
-                return this.addressMapper.convertToDTO(this.addressRepository.save(this.addressMapper.convertToEntity(address)));
+                address.setCustomer(this.customerMapper.convertToDTO(customer.get()));
+                return this.addressMapper.convertToDTO(
+                        this.addressRepository.save(this.addressMapper.convertToEntity(address))
+                );
             }
             throw new ResourceNotFoundException("Address " + addressId + " not found.");
         }
         throw new ResourceNotFoundException("Customer " + taxCode + " not found.");
     }
 
-    @Override
-    public AddressDTO deleteAddress(String taxCode, String addressId) throws ResourceNotFoundException {
+    @Override @SneakyThrows
+    public AddressDTO deleteAddress(String taxCode, String addressId) {
         final Optional<Customer> customer = this.customerRepository.findById(taxCode);
         if (customer.isPresent()) {
-            final Customer customerEntity = customer.get();
-            System.out.println(customerEntity.getAddresses());
-            Optional<Address> addressToDelete = customerEntity.getAddresses().stream()
-                    .filter((address -> {
-                        System.out.println(address.getId().toString());
-                        return address.getId().toString().equals(addressId);
-                    }))
-                    .findFirst();
-            if (addressToDelete.isPresent()) {
-                this.addressRepository.delete(addressToDelete.get());
-                return this.addressMapper.convertToDTO(addressToDelete.get());
+            final Optional<Address> address = this.addressRepository.findById(addressId);
+            if (address.isPresent()) {
+                this.addressRepository.delete(address.get());
+                return this.addressMapper.convertToDTO(address.get());
             }
             throw new ResourceNotFoundException("Address " + addressId + " not found.");
         }
