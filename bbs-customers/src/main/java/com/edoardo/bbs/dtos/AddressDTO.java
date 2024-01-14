@@ -1,12 +1,10 @@
 package com.edoardo.bbs.dtos;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data @Builder @NoArgsConstructor @AllArgsConstructor
 public class AddressDTO {
@@ -36,5 +34,6 @@ public class AddressDTO {
     @Size(min = 1, max = 50, message = "Address postal code must be at most 50 character long.")
     private String postalCode;
 
+    @EqualsAndHashCode.Exclude @JsonBackReference
     private CustomerDTO customer;
 }

@@ -2,10 +2,7 @@ package com.edoardo.bbs.entities;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.io.Serial;
 import java.io.Serializable;
@@ -45,6 +42,6 @@ public class Customer implements Serializable {
     private String idCard;
 
     @OneToMany(fetch = FetchType.LAZY, cascade =  CascadeType.ALL, mappedBy = "customer", orphanRemoval = true)
-    @JsonManagedReference
+    @JsonManagedReference @EqualsAndHashCode.Exclude
     private Set<Address> addresses = new HashSet<>();
 }

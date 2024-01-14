@@ -1,5 +1,6 @@
 package com.edoardo.bbs.entities;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import lombok.*;
@@ -33,7 +34,7 @@ public class Address implements Serializable {
     @Column(name = "postal_code", nullable = false, length = 20)
     private String postalCode;
 
-    @ManyToOne @EqualsAndHashCode.Exclude @JoinColumn(name = "customer", referencedColumnName = "tax_code")
-    @JsonManagedReference
+    @ManyToOne @JoinColumn(name = "customer", referencedColumnName = "tax_code")
+    @JsonBackReference @EqualsAndHashCode.Exclude
     private Customer customer;
 }

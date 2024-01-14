@@ -1,11 +1,9 @@
 package com.edoardo.bbs.dtos;
 
 import com.edoardo.bbs.validation.rules.BirthDateValid;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.validation.constraints.*;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 import java.util.Set;
@@ -13,7 +11,6 @@ import java.util.Set;
 @Data @Builder @NoArgsConstructor @AllArgsConstructor
 public class CustomerDTO {
 
-    @NotNull(message = "Customer first name must not be null.")
     private String taxCode;
 
     @NotNull(message = "Customer first name must not be null.")
@@ -44,5 +41,8 @@ public class CustomerDTO {
     private String idCard;
 
     @NotEmpty(message = "Customer addresses cannot be empty.")
+    @Size(min = 1, max = 3, message = "Customer addresses must be at least 1 and at most 3.")
+    @EqualsAndHashCode.Exclude
+    @JsonManagedReference
     private Set<AddressDTO> addresses;
 }
