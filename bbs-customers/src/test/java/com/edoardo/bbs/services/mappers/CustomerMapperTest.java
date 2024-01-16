@@ -4,15 +4,13 @@ import com.edoardo.bbs.dtos.AddressDTO;
 import com.edoardo.bbs.dtos.CustomerDTO;
 import com.edoardo.bbs.entities.Address;
 import com.edoardo.bbs.entities.Customer;
+import com.edoardo.bbs.factories.AddressFactory;
+import com.edoardo.bbs.factories.CustomerFactory;
 import com.edoardo.bbs.mapper.CustomerMapper;
-import com.github.javafaker.Faker;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-
-import java.time.ZoneId;
-import java.util.HashSet;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -20,62 +18,31 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 @SpringBootTest
 public class CustomerMapperTest {
 
-    private final Faker faker;
     private Address address;
     private Customer customer;
     private AddressDTO addressDTO;
     private CustomerDTO customerDTO;
+    private final AddressFactory addressFactory;
     private final CustomerMapper customerMapper;
+    private final CustomerFactory customerFactory;
 
     @Autowired
-    public CustomerMapperTest (CustomerMapper customerMapper) {
-        this.faker = new Faker();
+    public CustomerMapperTest (
+            AddressFactory addressFactory,
+            CustomerMapper customerMapper,
+            CustomerFactory customerFactory
+    ) {
+        this.addressFactory = addressFactory;
         this.customerMapper = customerMapper;
+        this.customerFactory = customerFactory;
     }
 
     @BeforeEach
     public void init () {
-        this.customer = Customer.builder().taxCode(this.faker.code().isbn10())
-                .firstName(this.faker.name().firstName())
-                .lastName(this.faker.name().lastName())
-                .birthDate(this.faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
-                .email(this.faker.internet().emailAddress())
-                .emailVerifiedAt(this.faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
-                .password(this.faker.internet().password())
-                .idCard(this.faker.file().toString())
-                .addresses(new HashSet<>())
-                .build();
-
-        this.customerDTO = CustomerDTO.builder().taxCode(this.faker.code().isbn10())
-                .firstName(this.faker.name().firstName())
-                .lastName(this.faker.name().lastName())
-                .birthDate(this.faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
-                .email(this.faker.internet().emailAddress())
-                .emailVerifiedAt(this.faker.date().birthday().toInstant().atZone(ZoneId.systemDefault()).toLocalDate())
-                .password(this.faker.internet().password())
-                .idCard(this.faker.file().toString())
-                .addresses(new HashSet<>())
-                .build();
-
-        this.address = Address.builder()
-                .id(this.faker.number().randomDigit())
-                .country(this.faker.address().country())
-                .state(this.faker.address().state())
-                .city(this.faker.address().city())
-                .street(this.faker.address().streetName())
-                .streetNumber(Integer.parseInt(this.faker.address().streetAddressNumber()))
-                .postalCode(this.faker.address().zipCode())
-                .build();
-
-        this.addressDTO = AddressDTO.builder()
-                .id(this.faker.number().randomDigit())
-                .country(this.faker.address().country())
-                .state(this.faker.address().state())
-                .city(this.faker.address().city())
-                .street(this.faker.address().streetName())
-                .streetNumber(Integer.parseInt(this.faker.address().streetAddressNumber()))
-                .postalCode(this.faker.address().zipCode())
-                .build();
+        this.address = this.addressFactory.create();
+        this.customer = this.customerFactory.create();
+        this.addressDTO = this.addressFactory.createDTO();
+        this.customerDTO = this.customerFactory.createDTO();
     }
 
     @Test
