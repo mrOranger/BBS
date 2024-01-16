@@ -8,14 +8,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 
 public class AddressFactory implements Factory<Address, AddressDTO> {
 
+    @Autowired
     private Faker faker;
 
     @Autowired
     private AddressMapper addressMapper;
-
-    public AddressFactory () {
-        this.faker = new Faker();
-    }
 
     @Override
     public Address create() {
