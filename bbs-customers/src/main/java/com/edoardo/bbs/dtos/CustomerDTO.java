@@ -5,11 +5,12 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.Set;
 
 @Data @Builder @NoArgsConstructor @AllArgsConstructor
-public class CustomerDTO {
+public class CustomerDTO implements Serializable {
 
     private String taxCode;
 

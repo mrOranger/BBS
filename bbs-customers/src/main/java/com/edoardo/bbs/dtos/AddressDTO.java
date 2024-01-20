@@ -6,8 +6,10 @@ import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
 import lombok.*;
 
+import java.io.Serializable;
+
 @Data @Builder @NoArgsConstructor @AllArgsConstructor
-public class AddressDTO {
+public class AddressDTO implements Serializable {
     private Integer id;
 
     @NotNull(message = "Address country must be not empty.")
