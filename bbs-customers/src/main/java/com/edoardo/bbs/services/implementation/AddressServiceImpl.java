@@ -26,8 +26,8 @@ public class AddressServiceImpl implements AddressService {
 
     @Autowired
     public AddressServiceImpl(
-            AddressRepository addressRepository,
             CustomerRepository customerRepository,
+            AddressRepository addressRepository,
             CustomerMapper customerMapper,
             AddressMapper addressMapper
     ) {

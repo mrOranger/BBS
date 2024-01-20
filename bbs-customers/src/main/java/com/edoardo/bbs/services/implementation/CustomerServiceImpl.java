@@ -2,18 +2,18 @@ package com.edoardo.bbs.services.implementation;
 
 import com.edoardo.bbs.dtos.CustomerDTO;
 import com.edoardo.bbs.dtos.CustomerResponse;
-import com.edoardo.bbs.entities.Address;
 import com.edoardo.bbs.entities.Customer;
-import com.edoardo.bbs.exceptions.MaximumAddressNumberException;
 import com.edoardo.bbs.exceptions.ResourceConflictException;
 import com.edoardo.bbs.exceptions.ResourceNotFoundException;
-import com.edoardo.bbs.mapper.AddressMapper;
 import com.edoardo.bbs.mapper.CustomerMapper;
-import com.edoardo.bbs.repositories.AddressRepository;
 import com.edoardo.bbs.repositories.CustomerRepository;
 import com.edoardo.bbs.services.CustomerService;
 import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheConfig;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
+import org.springframework.cache.annotation.Caching;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
@@ -21,28 +21,22 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.*;
 
-@Service
+@Service @CacheConfig(cacheNames = "customers")
 public class CustomerServiceImpl implements CustomerService {
     private final CustomerRepository customerRepository;
 
-    private final AddressRepository addressRepository;
     private final CustomerMapper customerModelMapper;
-    private final AddressMapper addressMapper;
 
     @Autowired
     public CustomerServiceImpl(
             CustomerRepository customerRepository,
-            AddressRepository addressRepository,
-            CustomerMapper customerModelMapper,
-            AddressMapper addressMapper
+            CustomerMapper customerModelMapper
     ) {
-        this.addressMapper = addressMapper;
-        this.addressRepository = addressRepository;
         this.customerRepository = customerRepository;
         this.customerModelMapper = customerModelMapper;
     }
 
-    @Override
+    @Override @Cacheable
     public CustomerResponse getAllCustomers(Pageable pageable) {
         final Page<Customer> customers = this.customerRepository.findAll(pageable);
         final List<Customer> customersList = customers.getContent();
@@ -58,21 +52,21 @@ public class CustomerServiceImpl implements CustomerService {
                 .build();
     }
 
-    @Override
+    @Override @Cacheable(value = "names", key = "#firstName.concat('-').concat(#lastName)", sync = true)
     public List<CustomerDTO> getCustomersByFirstNameAndLastName(String firstName, String lastName) {
         return this.customerRepository.findByFirstNameAndLastName(firstName, lastName).stream()
                 .map(this.customerModelMapper::convertToDTO)
                 .toList();
     }
 
-    @Override
+    @Override @Cacheable(value = "birthDate", key = "#birthDate", sync = true)
     public List<CustomerDTO> getCustomersByBirthDate(LocalDate birthDate) {
         return this.customerRepository.findByBirthDate(birthDate).stream()
                 .map(this.customerModelMapper::convertToDTO)
                 .toList();
     }
 
-    @Override @SneakyThrows
+    @Override @SneakyThrows @Cacheable(value = "taxCode", key = "#taxCode", sync = true)
     public CustomerDTO getCustomerByTaxCode(String taxCode) {
         final Optional<Customer> customer = this.customerRepository.findById(taxCode);
         if (customer.isPresent()) {
@@ -82,6 +76,12 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override @SneakyThrows
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "customers", allEntries = true),
+            @CacheEvict(cacheNames = "taxCode", key = "#customer.taxCode"),
+            @CacheEvict(cacheNames = "birthDate", key = "#customer.birthDate"),
+            @CacheEvict(cacheNames = "names", key = "#customer.firstName.concat('-').concat(#customer.lastName)")
+    })
     public CustomerDTO createCustomer(CustomerDTO customer) {
         final Optional<Customer> existingCustomer = this.customerRepository.findById(customer.getTaxCode());
         if (existingCustomer.isEmpty()) {
@@ -93,6 +93,12 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override @SneakyThrows
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "taxCode", key = "#taxCode"),
+            @CacheEvict(cacheNames = "customers", allEntries = true),
+            @CacheEvict(cacheNames = "birthDate", key = "#customer.birthDate"),
+            @CacheEvict(cacheNames = "names", key = "#customer.firstName.concat('-').concat(#customer.lastName)")
+    })
     public CustomerDTO updateCustomer(String taxCode, CustomerDTO customer) {
         final Optional<Customer> existingCustomer = this.customerRepository.findById(taxCode);
         if (existingCustomer.isPresent()) {
@@ -105,6 +111,12 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override @SneakyThrows
+    @Caching(evict = {
+            @CacheEvict(cacheNames = "customers", allEntries = true),
+            @CacheEvict(cacheNames = "taxCode", key = "#taxCode"),
+            @CacheEvict(cacheNames = "birthDate", allEntries = true),
+            @CacheEvict(cacheNames = "names", allEntries = true),
+    })
     public CustomerDTO deleteCustomer(String taxCode) {
         final Optional<Customer> existingCustomer = this.customerRepository.findById(taxCode);
         if (existingCustomer.isEmpty()) {
