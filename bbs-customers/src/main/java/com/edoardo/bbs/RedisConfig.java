@@ -1,26 +1,24 @@
 package com.edoardo.bbs;
 
-import org.springframework.boot.autoconfigure.cache.RedisCacheManagerBuilderCustomizer;
+import com.edoardo.bbs.entities.Address;
+import com.edoardo.bbs.entities.Customer;
 import org.springframework.context.annotation.Bean;
-import org.springframework.data.redis.cache.RedisCacheConfiguration;
-
-import java.time.Duration;
+import org.springframework.data.redis.connection.RedisConnectionFactory;
+import org.springframework.data.redis.core.RedisTemplate;
 
 public class RedisConfig {
 
     @Bean
-    public RedisCacheConfiguration cacheConfiguration () {
-        return RedisCacheConfiguration.defaultCacheConfig()
-                .entryTtl(Duration.ofMinutes(60))
-                .disableCachingNullValues();
-    }\
-
-    @Bean
-    public RedisCacheManagerBuilderCustomizer redisCacheManagerBuilderCustomizer () {
-        return (builder) ->
-            builder
-                .withCacheConfiguration("customers", RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofMinutes(10)))
-                .withCacheConfiguration("addresses", RedisCacheConfiguration.defaultCacheConfig().entryTtl(Duration.ofMinutes(60)));
+    public RedisTemplate<String, Customer> redisCustomerTemplate (RedisConnectionFactory connectionFactory) {
+        RedisTemplate<String, Customer> template = new RedisTemplate<>();
+        template.setConnectionFactory(connectionFactory);
+        return template;
     }
 
+    @Bean
+    public RedisTemplate<Integer, Address> redisAddressTemplate (RedisConnectionFactory connectionFactory) {
+        RedisTemplate<Integer, Address> template = new RedisTemplate<>();
+        template.setConnectionFactory(connectionFactory);
+        return template;
+    }
 }
