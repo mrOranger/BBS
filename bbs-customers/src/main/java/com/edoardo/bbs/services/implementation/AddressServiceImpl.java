@@ -42,7 +42,7 @@ public class AddressServiceImpl implements AddressService {
         final Optional<Customer> customer = this.customerRepository.findById(taxCode);
         if (customer.isPresent()) {
             final Customer customerEntity = customer.get();
-            if (customerEntity.getAddresses().size() < 2) {
+            if (customerEntity.getAddresses().size() < 3) {
                 Address addressEntity = this.addressMapper.convertToEntity(address);
                 addressEntity.setCustomer(customerEntity);
                 return this.addressMapper.convertToDTO(this.addressRepository.save(addressEntity));
