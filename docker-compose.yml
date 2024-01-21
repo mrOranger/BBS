@@ -42,16 +42,6 @@ services:
       - PGADMIN_DEFAULT_EMAIL=root@example.com
       - PGADMIN_DEFAULT_PASSWORD=root
 
-  redis:
-    image: redis
-    container_name: bbs-redis
-    restart: always
-    build:
-      context: ./dockerfiles
-      dockerfile: dockerfiles/redis.dockerfile
-    ports:
-      - '6379:6379'
-
 volumes:
   redis-volume:
     driver: local
