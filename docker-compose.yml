@@ -41,8 +41,24 @@ services:
       - PGADMIN_CONFIG_SERVER_MODE=True
       - PGADMIN_DEFAULT_EMAIL=root@example.com
       - PGADMIN_DEFAULT_PASSWORD=root
+  mongodb:
+    image: mongo
+    restart: unless-stopped
+    container_name: mongodb
+    environment:
+      MONGO_INITDB_ROOT_USERNAME: root
+      MONGO_INITDB_ROOT_PASSWORD: example
+    volumes:
+      - mongo-volume:/data/db
+    networks:
+      pgsql_network:
+        ipv4_address: 172.22.0.4
+    ports:
+      - target: 27017
+        published: 37017
+        protocol: tcp
+        mode: host
 
 volumes:
-  redis-volume:
-    driver: local
+  mongo-volume:
   postgres-volume:
